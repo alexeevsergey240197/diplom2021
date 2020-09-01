@@ -1,0 +1,120 @@
+<html lang="ru" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <title>Авторизация</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js">
+    <style>
+/* Button */
+ .btn {
+ border-radius: 100px;
+ font-size:15px;
+
+ letter-spacing: 1px;
+ padding: 22px 39px;
+ text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.14);
+
+ box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.2);
+}
+
+ .btn-light{
+ /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f2f2f2+0,dddddd+50,ffffff+51,ffffff+71,f6f8fb+100 */
+ background: #f2f2f2;
+ /* Old browsers */
+ background: -moz-linear-gradient(-45deg, #f2f2f2 0%, #dddddd 50%, #ffffff 51%, #ffffff 71%, #f6f8fb 100%);
+ /* FF3.6-15 */
+ background: -webkit-linear-gradient(-45deg, #f2f2f2 0%,#dddddd 50%,#ffffff 51%,#ffffff 71%,#f6f8fb 100%);
+ /* Chrome10-25,Safari5.1-6 */
+ background: linear-gradient(135deg, #f2f2f2 0%,#dddddd 50%,#ffffff 51%,#ffffff 71%,#f6f8fb 100%);
+ /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f2f2', endColorstr='#f6f8fb',GradientType=1 );
+ /* IE6-9 fallback on horizontal gradient */
+ color: #3f345f !important;
+ background-size: 400% 400%;
+ -webkit-animation: AnimationName 3s ease infinite;
+ -moz-animation: AnimationName 3s ease infinite;
+ animation: AnimationName 3s ease infinite;
+ -webkit-animation: AnimationName 3s ease infinite;
+ -moz-animation: AnimationName 3s ease infinite;
+ animation: AnimationName 3s ease infinite;
+ border: medium none;
+}
+ @-webkit-keyframes AnimationName {
+ 0%{
+ background-position:0% 31%
+ }
+ 50%{
+ background-position:100% 70%
+ }
+ 100%{
+ background-position:0% 31%
+ }
+}
+ @-moz-keyframes AnimationName {
+ 0%{
+ background-position:0% 31%
+ }
+ 50%{
+ background-position:100% 70%
+ }
+ 100%{
+ background-position:0% 31%
+ }
+}
+ @keyframes AnimationName {
+ 0%{
+ background-position:0% 31%
+ }
+ 50%{
+ background-position:100% 70%
+ }
+ 100%{
+ background-position:0% 31%
+ }
+}
+ .btn-outline-light:hover{
+ color: #3f345f;
+}
+ .btn-outline-warning:hover{
+ color: #ffffff;
+}
+    </style>
+</head>
+<body>
+{% if request.user.is_authenticated %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h6 class="display-4"> Вы уже авторизованы как "{{request.user}}"</h6>
+    <p class="lead">
+        <a href="{% url 'main-page' %}">
+           Перейти на главную страницу
+        </a>
+    </p>
+</div>
+{% else %}
+<form id="login_form" method="post">
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-offset-3 col-md-6">
+                {% csrf_token %}
+                <div class="container text-center">
+                    {{ form }}
+                </div>
+                <div class="text-center">
+                    <p></p>
+                    <button form="login_form" type="submit" class="btn btn-light btn-sm.mt-4">АВТОРИЗОВАТЬСЯ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endif %}
+<div class="fixed-bottom">
+    <footer class="py-4 bg-light text-black-50">
+        <div class="container text-center">
+            <small>Государственный комитет цифрового развития и связи Республики Хакасия &copy; 2020 Телефон -
+                237-994</small>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

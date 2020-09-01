@@ -1,0 +1,52 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Проверка формы
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center">
+        <h1 class="display-4">Проверка формы</h1>
+    </div>
+    <div class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Наименование:</strong> {{report.name}}</li>
+        <li class="list-group-item"><strong>Организация:</strong> {{report.organisation}}</li>
+        <li class="list-group-item"><strong>Дата создания:</strong> {{report.start_date}}</li>
+        <li class="list-group-item"><strong>ID:</strong> {{report.id}}</li>
+    </div>
+    <div class="text-center">
+        <strong>Наименования заголовков:</strong>
+    </div>
+    <table class="table table-bordered mt-4">
+        <tr>
+            {%for context in contextTABLE%}
+            <td>{{context}}</td>
+            {% endfor %}
+        </tr>
+    </table>
+    <div class="alert alert-info" role="alert">
+        <div class="bd-example">
+            <strong>Сообщение:</strong> <span class="border-0">{{report.message}}</span>
+        </div>
+        </div>
+        <div class="text-center">
+        <div class="alert alert-success" role="alert">
+            <strong>Шаг 3 </strong>Проверьте информацию о отчете
+        </div>
+        <div class="row justify-content-around">
+            <div class="col-4">
+                <a href="{% url 'sended_reports' %}">
+                    <button type="submit" class="btn btn-outline-success">Сохранить</button>
+                </a>
+            </div>
+            <div class="col-4">
+                <a href="delete/{{report.id}}">
+                    <button class="btn btn-outline-danger">Удалить</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Создание пользователя
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+
+  <form method="POST">
+  {% csrf_token %}
+
+
+  <div class="alert alert-info" role="alert">
+  <p> В имени допустимы только латинские буквы, цифры и символы @/./+/-/_.</p>
+<ul>
+  <li>Пароль не должен совпадать с вашим именем или другой персональной информацией или быть слишком похожим на неё.</li>
+  <li>Пароль должен содержать как минимум 8 символов..</li>
+  <li>Пароль не может быть одним из широко распространённых паролей..</li>
+  <li>Пароль не может состоять только из цифр</li>
+</ul>
+  </div>
+
+
+<label for="inputAddress">Имя</label>
+  {{ form.username  }}
+
+  <div class="form-row">
+  <div class="form-group col-md-6">
+            <label for="inputEmail4">Пароль</label>
+          {{ form.password1 }}
+    </div>
+  <div class="form-group col-md-6">
+
+                <label for="inputEmail4">Подтверждение пароля</label>
+          {{ form.password2 }}
+    </div>
+
+
+
+    <div class="alert alert-danger" role="alert">
+      {{ form.username.errors}}
+      {{ form.password1.errors}}
+      {{ form.password2.errors}}
+        </div>
+
+
+  </div>
+  <button type="submit" class="btn btn-outline-success">Добавить</button>
+
+
+  </form>
+  </div>
+{% endblock %}

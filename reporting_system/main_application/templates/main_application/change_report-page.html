@@ -1,0 +1,44 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Радактирование отчета
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-4 ">
+    <p class="lead"> Отчет: "<b>{{report.name}}</b>" ID: "<b>{{report.id}}</b>" </p>
+    <table class="table table-bordered mt-4">
+        <tr>
+            {%for name in namesTABLE%}
+            <th scope="col">{{name}}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            {%for context in contextTABLE %}
+            <th>{{ context }}</th>
+            {% endfor %}
+        </tr>
+    </table>
+    Изменить поля на:
+     <p><small class="text-muted"> Не оставляйте поля пустыми</small></p>
+    <form method="POST">
+        {% csrf_token %}
+        <table class="table table-bordered mt-4">
+            <tr>
+                {%for name in names_for_input%}
+                <th><textarea class="form-control" name='{{ name }}' placeholder="Поле ввода" rows="3"></textarea></th>
+                {% endfor %}
+            </tr>
+        </table>
+        <div class="text-center">
+            <button type="submit" class="btn btn-outline-success">Внести изменения</button>
+        </div>
+    </form>
+    <p class="h4"> Сообщение от поручителя: </p>
+    <small class="text-muted"> Дата обновления отчета: {{report.update_time}}</small>
+    <table class="table table-bordered mt-4">
+        <th><p>{{ report.message_help }}</p></th>
+    </table>
+</div>
+{% endblock %}

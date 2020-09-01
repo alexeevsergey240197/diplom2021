@@ -1,0 +1,50 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Результат поиска
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto">
+        <div class="text-center">
+            <h1 class="display-4"> Результат поиска </h1>
+        </div>
+           {% if reports %}
+ <table class="table table-hover table-bordered mt-4">
+        <tbody>
+        <tr>
+            <th class="text-center">id</th>
+            <th class="text-center">Дата создания</th>
+            <th class="text-center">Дата обновления</th>
+            <th class="text-center">Название</th>
+            <th class="text-center">Организация</th>
+            <th class="text-center">Статус</th>
+            <th class="text-center">Действия</th>
+        </tr>
+        {% for report in reports %}
+        <tr>
+            <th class="text-center">{{report.id}}</th>
+            <td class="text-center">{{report.start_date}}</td>
+            <td class="text-center">{{report.update_time}}</td>
+            <td class="text-center">{{report.name}}</td>
+            <td class="text-center">{{report.organisation}}</td>
+            <td class="text-center">{{report.status}}</td>
+            <td><a href="/edit/{{report.id}}">Редактировать</a> | <a href="/delete/{{report.id}}">Удалить</a></td>
+        </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+        {% endif%}
+        {% if count == 'None'%}
+        {% else %}
+           {% if count != 0 %}
+    <b> Кол-во найденных отчётов: {{ count }} </b>
+        {% else %}
+        Поиск не дал результатов
+        {% endif%}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

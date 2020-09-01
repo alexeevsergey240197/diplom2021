@@ -1,0 +1,27 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Изменение электронной почты
+{% endblock %}
+
+
+{% block content %}
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4"> Изменение электронной почты </h1>
+</div>
+<div class="container mt-4">
+    <div class="text-center">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+            {{ form.email }}
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

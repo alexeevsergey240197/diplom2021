@@ -1,0 +1,31 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Добавить организацию пользователю
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-4">
+  <h1 class="display-4 text-center pb-md-4">Присвоение организации</h1>
+<form method="POST">
+    {% csrf_token %}
+  <div class='text-center'>
+  Выберите организацию для пользователя <b>"{{ user }}"</b>
+  </div>
+  <div class="row mt-4">
+    <div class="col-8">
+      <select class="form-control" name='organisation'>
+          <option disabled selected>Выберите организацию</option>
+        {% for organisation in organisations %}
+        <option>{{organisation}}</option>
+        {% endfor %}
+      </select>
+        </div>
+        <div class="col-4">
+<button type="submit" class="btn btn-outline-success">Назначить</button>
+</div>
+</div>
+</form>
+  </div>
+{% endblock %}

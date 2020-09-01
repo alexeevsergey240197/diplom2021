@@ -1,0 +1,33 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Радактирование отчета
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-4 ">
+    <p class="lead"> Редактирование "<b>{{report.name}}</b>" </p>
+    <form method="POST">
+        <table class="table table-bordered mt-4">
+            <tr>
+                {%for data_top in top%}
+                <th scope="col">{{data_top}}</th>
+                {% endfor %}
+            </tr>
+            {% csrf_token %}
+            <tr>
+                {%for data in inputs%}
+                <th><textarea class="form-control" name={{data}} id="1"
+                             placeholder="Поле ввода" rows="3"></textarea></th>
+                {% endfor %}
+            </tr>
+        </table>
+        <div class="text-center">
+            <button type="submit" class="btn btn-outline-success">Отправить</button>
+        </div>
+    </form>
+    <p class="h4"> Сообщение </p> <small class="text-muted">{{report.update_time}}</small>
+    <p> {{ message }} </p>
+</div>
+{% endblock %}

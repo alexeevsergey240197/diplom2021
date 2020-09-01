@@ -1,0 +1,43 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Создание формы отчета
+{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h1 class="display-4"> Создание формы отчета</h1>
+</div>
+<div class="container mt-4">
+    <form method="POST">
+        <div class="form-row">
+            {% csrf_token %}
+            <div class="form-group col-md-6">
+                <label>Наименование</label>
+                {{ form.name }}
+            </div>
+            <div class="form-group col-md-4">
+                <label>Организация</label>
+                {{ form.organisation }}
+            </div>
+            <div class="form-group col-md-2">
+                <label>Столбцы</label>
+                {{ form.columns }}
+            </div>
+            <div class="form-group">
+                <label>Дополнительное сообщение</label>
+                {{ form.message }}
+            </div>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Отправить</button>
+        </div>
+    </form>
+<p> </p>
+    <div class="text-center">
+        <div class="alert alert-success" role="alert">
+            <strong>Шаг 1 </strong>Введите основную информацю о отчете
+        </div>
+    </div>
+</div>
+{% endblock %}

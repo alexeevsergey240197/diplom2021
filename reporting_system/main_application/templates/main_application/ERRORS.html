@@ -1,0 +1,14 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Проблема!
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-4 ">
+  <div class="alert alert-primary" role="alert">
+  {{ errors }}
+</div>
+</div>
+{% endblock %}

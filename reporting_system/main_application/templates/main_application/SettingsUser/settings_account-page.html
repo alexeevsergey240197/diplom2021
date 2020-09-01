@@ -1,0 +1,77 @@
+{% extends 'main_application/base.html' %}
+{% load static %}
+{% block title %}
+Настройка аккаунта
+{% endblock %}
+
+{% block content %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <img src="{% static 'images/settiongs-logo.png' %}"
+         width="133" height="133">
+    <h1 class="display-4"> Настройка аккаунта</h1>
+</div>
+<div class="container">
+    <table class="table table-borderless">
+        <tbody>
+        <tr>
+            <td>Имя</td>
+            <td>{{ user.user }}</td>
+            <td><a href="/change_name/{{ user.id }}">
+                <button type="button" class="btn btn-success">Изменить</button>
+            </a>
+            </td>
+        </tr>
+        <tr>
+            <td>Электронная почта</td>
+            <td>{% if user.email %}
+                {{ user.email }}
+                {% else %}
+                Отсутствует
+                {% endif %}
+            </td>
+            <td>
+                <a href="/change_email/{{ user.id }}">
+                    <button type="button" class="btn btn-success">
+                        {% if user.email %}
+                        Изменить
+                        {% else %}
+                        Добавить
+                        {% endif %}
+                    </button>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>Телефонный номер</td>
+            <td>{% if user.phone_number %}
+                {{ user.phone_number }}
+            {% else %}
+            Отсутствует
+            {% endif %}
+            </td>
+            <td>
+                <a href="/change_phone/{{ user.id }}">
+                    <button type="button" class="btn btn-success">
+                        {% if user.phone_number %}
+                        Изменить
+                        {% else %}
+                        Добавить
+                        {% endif %}
+                    </button>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>Роль пользователя</td>
+            <td>
+          {% if ROLE %}
+            {{ ROLE }}
+          {% else %}
+          Роль не присвоена
+          {% endif%}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

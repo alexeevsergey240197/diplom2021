@@ -1,0 +1,152 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Пользователи
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-4">
+<h1 class="display-4 text-center pb-md-4">Пользователи системы</h1>
+<div class="row justify-content-between">
+<div class="col-4">
+<a href="{% url 'create_user' %}"><button type="button" class="btn btn-success">Добавить нового пользователя в систему</button></a>
+</div>
+<div class="col-4">
+<input class="form-control" type="text" placeholder="Быстрый поиск" id="search-text" onkeyup="tableSearch()">
+</div>
+</div>
+<p> </p>
+    <table class="table table-hover" id="info-table">
+    <thead>
+      <tr>
+        <th >id</th>
+        <th scope="col" class='text-center'>Организация</th>
+        <th scope="col" class='text-center'>Имя пользователя</th>
+        <th scope="col" class='text-center'>Роль</th>
+        <th scope="col" class='text-center'>Контактные данные</th>
+        <th scope="col" class='text-center'>Действия</th>
+      </tr>
+      </thead>
+        <tbody>
+          {% for user in users %}
+            <tr>
+                <td>{{user.user.id}}</td>
+                <td class='text-center'>
+                  {% if user.organisation %}
+                  {{user.organisation}}
+                  {% else%}
+                  <a href="/add_organisation_to_user/{{user.user.id}}"><button type="button" class="btn btn-info">Добавить организацию</button></a>
+                  {% endif %}
+                </td>
+                <td class='text-center'>{{user.user.username}}</td>
+
+                <td class='text-center'>
+                  {% if user.role %}
+                  {{user.role}}
+                  {% else %}
+                  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#givearole{{user.user.id}}">Назначить роль</button>
+                  {% endif %}
+                </td>
+
+
+                <td class='text-center'>
+                  {% if user.email %}
+                  {{user.email}}
+                  {% else%}
+                  Пользователь не указал Email
+                  {% endif %}
+                  |
+                  {% if user.phone_number %}
+                  {{user.phone_number}}
+                  {% else%}
+                  Пользователь не указал номер телефона
+                  {% endif %}
+                  </td>
+                <td><button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete{{user.user.id}}">Удалить</button></td>
+            </tr>
+
+            <div class="modal fade" id="givearole{{user.user.id}}">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <!-- Modal Header -->
+                  <div class="modal-header">
+                    <h4 class="modal-title">Назначение организации пользователю "{{user.user.username}}"</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                  </div>
+                  <!-- Modal body -->
+                  <form method="POST">
+                    {% csrf_token %}
+                  <div class="modal-body">
+                      <input type="text" class='form-control' name="id" value="{{user.id}}" readonly>
+                      <div class="form-group">
+                      <label>Выберите роль</label>
+                      <select class="form-control" name='role'>
+                        {% for role in roles %}
+                        <option>{{ role }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Modal footer -->
+                  <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Назначить</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                  </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- The Modal -->
+            <div class="modal fade" id="delete{{user.user.id}}">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <!-- Modal Header -->
+                  <div class="modal-header">
+                    <h4 class="modal-title">Удаление "{{user.user.username}}"</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                  </div>
+                  <!-- Modal body -->
+                  <div class="modal-body">
+                  Вы действительного хотите удалить этого пользователя?
+                  </div>
+                  <!-- Modal footer -->
+                  <div class="modal-footer">
+                  <a href="/delete_user/{{user.id}}"><button type="button" class="btn btn-primary">Да</button></a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            {% endfor %}
+        </tbody>
+        <tbody>
+        </tbody>
+    </table>
+  </div>
+<script>
+  function tableSearch() {
+      var phrase = document.getElementById('search-text');
+      var table = document.getElementById('info-table');
+      var regPhrase = new RegExp(phrase.value, 'i');
+      var flag = false;
+      for (var i = 1; i < table.rows.length; i++) {
+          flag = false;
+          for (var j = table.rows[i].cells.length - 1; j >= 0; j--) {
+              flag = regPhrase.test(table.rows[i].cells[j].innerHTML);
+              if (flag) break;
+          }
+          if (flag) {
+              table.rows[i].style.display = "";
+          } else {
+              table.rows[i].style.display = "none";
+          }
+      }
+  }
+</script>
+{% endblock %}
