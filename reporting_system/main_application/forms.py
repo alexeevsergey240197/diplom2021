@@ -19,7 +19,7 @@ class AuthUserForm(AuthenticationForm, forms.ModelForm):
 
 class ReportForm(forms.ModelForm):
     class Meta:
-        model = ReportInfo
+        model = Report
         fields = (
             'name',
             'organisation',
@@ -43,7 +43,7 @@ class ReportForm(forms.ModelForm):
 
 class CheckReportForm(forms.ModelForm):
     class Meta:
-        model = ReportInfo
+        model = Report
         fields = ('status', 'message_help')
 
     def __init__(self, *args, **kwargs):
@@ -71,7 +71,7 @@ class SettingsUser(forms.ModelForm):
 
 class OrganisationForm(forms.ModelForm):
     class Meta:
-        model = OrganisationOfReport
+        model = Organisation
         fields = ('name',)
 
 
@@ -88,7 +88,7 @@ class myUserCreationForm(UserCreationForm):
         model=User
         fields = ('username', 'password1', 'password2')
 
-        
+
     def __init__(self, *args, **kwargs):
         super(myUserCreationForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['class'] = 'form-control'

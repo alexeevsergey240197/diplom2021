@@ -11,25 +11,22 @@ def ForMenu(request):
         try:
             USER = UserProfile.objects.get(user=username)
             role_check = USER.role
-            role_ckeck = str(role_check)
-            if role_check == RoleUser.objects.get(name='Администратор'):
+            if role_check == 'Администратор':
                 return {'user_organisation': USER.organisation, 'ROLE': 'Администратор'}
-            elif role_check == RoleUser.objects.get(name='Поручитель отчётности'):
-                ALL_with_status_new = ReportInfo.objects.filter(status__name='Новый')
-                ALl_with_status_under_consideration = ReportInfo.objects.filter(status__name='Рассматривается')
+            if role_check == 'Поручитель отчётности':
+                ALL_with_status_new = Report.objects.filter(status='Новый')
+                ALl_with_status_under_consideration = Report.objects.filter(status='Рассматривается')
                 return {
                     'user_organisation': USER.organisation,
                     'ALL_new_reports': ALL_with_status_new.count(),
                     'ALL_under_consideration': ALl_with_status_under_consideration.count(),
                     'ROLE': 'Поручитель отчётности'
                 }
-            elif role_check == RoleUser.objects.get(name='Субъект отчётности'):
-                objectsNEW = ReportInfo.objects.filter(status__name='Новый',
-                                                       organisation__name=USER.organisation)
-                objectsCHANGE = ReportInfo.objects.filter(status__name='Доработать',
-                                                          organisation__name=USER.organisation)
-                objectsUNDER_consideration = ReportInfo.objects.filter(status__name='Рассматривается',
-                                                                       organisation__name=USER.organisation)
+            if role_check == 'Субъект отчётности':
+                objectsNEW = Report.objects.filter(status='Новый', organisation__name=USER.organisation)
+                objectsCHANGE = Report.objects.filter(status='Доработать', organisation__name=USER.organisation)
+                objectsUNDER_consideration = Report.objects.filter(status='Рассматривается', organisation__name=USER.organisation)
+                print('&&&&&&&&&&&&&&&&&&&&&&&')
                 return {
                     'user_organisation': USER.organisation,
                     'new': objectsNEW.count(),
