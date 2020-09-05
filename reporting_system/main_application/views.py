@@ -1,12 +1,11 @@
 from django.views.generic import ListView
 from django.contrib.auth.views import LoginView
-from django.http import HttpResponseRedirect, HttpResponseNotFound, Http404
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.contrib import auth
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.forms import UserCreationForm
 from django.db import IntegrityError
 
 from .forms import *
@@ -51,7 +50,7 @@ def SearchReport(request):
         return redirect('login_page')
     else:
         organisations = Organisation.objects.all
-        statuses = ReportStatus.objects.all
+        statuses = ['Рассматривается', 'Доработать', 'Сформирован', 'Новый']
         count = 'None'
         if request.method == 'POST':
             date_start = request.POST.get('DateStart')
@@ -65,13 +64,13 @@ def SearchReport(request):
                 return render(request, 'main_application/SearchReport/result-page.html', {"reports": result,
                                                                                           "count": count})
             elif organisation == 'Все организации' and status != 'Любой статус':
-                result = Report.objects.filter(start_date__range=[date_start, date_end], status__name=status)
+                result = Report.objects.filter(start_date__range=[date_start, date_end], status=status)
                 return render(request, 'main_application/search-report.html', {"reports": result,
                                                                                "count": count})
             elif organisation != 'Все организации' and status != 'Любой статус':
                 result = Report.objects.filter(start_date__range=[date_start, date_end],
-                                                   status__name=status,
-                                                   organisation__name=organisation)
+                                               status=status,
+                                               organisation__name=organisation)
                 return render(request, 'main_application/search-report.html', {"reports": result,
                                                                                "count": count})
             else:
@@ -81,7 +80,7 @@ def SearchReport(request):
                 'organisation_list': organisations,
                 'statuses': statuses,
                 'count': count
-            }) #Переделать
+            })  # Переделать
 
 
 # Раздел редактирование субъектом отчета
@@ -119,36 +118,32 @@ def NeedChangeReports(request):
 
 
 def AddInfoIntoReport(request, id):
-    try:
-        report = Report.objects.get(id=id)
-        top = report.top_names.split('*#*')
-        names_for_input = []
-        columns = report.columns
+    report = Report.objects.get(id=id)
+    top = report.top_names.split('*#*')
+    names_for_input = []
+    columns = report.columns
+    for i in range(0, columns):
+        name_input = 'input' + str(i)
+        names_for_input.append(name_input)
+    context = {
+        "report": report,
+        'context': report.top_names,
+        'top': top,
+        'inputs': names_for_input,
+        'message': report.message
+    }
+    if request.method == "POST":
+        DATAlist = []
         for i in range(0, columns):
-            name_input = 'input' + str(i)
-            names_for_input.append(name_input)
-        context = {
-            "report": report,
-            'context': report.top_names,
-            'top': top,
-            'inputs': names_for_input,
-            'message': report.message
-        }
-        if request.method == "POST":
-            DATAlist = []
-            for i in range(0, columns):
-                add = request.POST.get(names_for_input[i])
-                DATAlist.append(add)
-            DATAstr = "*#*".join(DATAlist)
-            report.context = DATAstr
-            report.save()
-            add_status = ReportStatus.objects.get(name="Рассматривается")
-            add_status.Report_set.add(report, bulk=False)
-            return HttpResponseRedirect("/")
-        else:
-            return render(request, 'main_application/edit_report-page.html', context)
-    except Report.DoesNotExist:
-        return HttpResponseNotFound("<h2>Отчёт не найден</h2>")
+            add = request.POST.get(names_for_input[i])
+            DATAlist.append(add)
+        DATAstr = "*#*".join(DATAlist)
+        report.context = DATAstr
+        report.status = "Рассматривается"
+        report.save()
+        return HttpResponseRedirect("/")
+    else:
+        return render(request, 'main_application/edit_report-page.html', context)
 
 
 def ChangeReports(request, id):
@@ -172,10 +167,10 @@ def ChangeReports(request, id):
             DATAlist.append(add)
         DATAstr = "*#*".join(DATAlist)
         report.context = DATAstr
+        report.status = "Рассматривается"
         report.save()
-        add_status = ReportStatus.objects.get(name="Рассматривается")
-        add_status.Report_set.add(report, bulk=False)
-        return redirect('main-page')
+        message = 'Ваши изменения отчёта применены'
+        return render(request, 'main_application/READY.html', {"message": message})
     return render(request, 'main_application/change_report-page.html', context)
 
 
@@ -196,6 +191,7 @@ def CreateFormReport(request):
             name = form.cleaned_data['name']
             report = Report.objects.get(name=name)
             report.status = 'Новый'
+            report.save()
             request.session['report_name'] = str(report.name)
         return redirect('add_names')
     return render(request, 'main_application/CreateFormReport/add_template_report-page.html', {'form': form})
@@ -234,12 +230,13 @@ def CheckingInfoReport(request):
 
 def DeleteReport(request, id):
     report = Report.objects.get(id=id)
+    message = 'Отчёт ' + str(report.name) + ' удалён'
     report.delete()
-    return redirect("main-page")
+    return render(request, 'main_application/READY.html', {"message": message})
 
 
 def CheckReportsList(request):
-    list_reports = Report.objects.filter(status__name="Рассматривается")
+    list_reports = Report.objects.filter(status="Рассматривается")
     return render(request, 'main_application/check-reports-page.html', {'list_reports': list_reports})
 
 
@@ -256,11 +253,14 @@ def CheckReport(request, id):
         if form.is_valid():
             added_status = form.cleaned_data['status']
             added_message = form.cleaned_data['message_help']
-            status = ReportStatus.objects.get(name=added_status)
+            report.status = added_status
             report.message_help = added_message
-            status.Report_set.add(report, bulk=False)
+            print(added_status)
             report.save()
-            message = "Отчёт " + str(report.name) + " сформирован и помещен в архив"
+            if added_status == 'Сформирован':
+                message = "Отчёт " + str(report.name) + " сформирован и помещен в архив"
+            else:
+                message = 'Статус "' + str(added_status) + '" присвоен для отчёта: ' + str(report.name)
             return render(request, 'main_application/READY.html', {"message": message})
     return render(request, 'main_application/check_report-page.html', context)
 
@@ -331,21 +331,22 @@ def ChangePhone(request, id):
         else:
             raise Http404('Нет доступа')
 
+
 # админка
 
-def AdminOrganisations (request):
-    all_organisations= Organisation.objects.all
+def AdminOrganisations(request):
+    all_organisations = Organisation.objects.all
     form = OrganisationForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
             form.save()
         return redirect('admin_organisations')
     return render(request, 'main_application/AdminPanel/admin_organisations.html',
-     {"organisations": all_organisations,
-     'form':form})
+                  {"organisations": all_organisations,
+                   'form': form})
 
 
-def RenameOrganisation (request, id):
+def RenameOrganisation(request, id):
     organisation = Organisation.objects.get(id=id)
     if request.method == 'POST':
         NewName = request.POST.get('NewName')
@@ -353,21 +354,20 @@ def RenameOrganisation (request, id):
         organisation.save()
         return redirect('admin_organisations')
     return render(request, 'main_application/AdminPanel/rename_organisation-page.html',
-    {"organisation": organisation })
+                  {"organisation": organisation})
 
 
-def DeleteOrganisation (request, id):
+def DeleteOrganisation(request, id):
     try:
         organisation = Organisation.objects.get(id=id)
         organisation.delete()
         return redirect("admin_organisations")
     except IntegrityError:
-        error = 'Не удаляйте организацию, к которой привязаны аккаунты пользователей. Сначала удалите аккаунты этой организации'
+        error = 'Сначала удалите аккаунты этой организации'
         return render(request, 'main_application/ERRORS.html', {"errors": error})
 
 
-
-def UsersList (request):
+def UsersList(request):
     users = UserProfile.objects.all
     roles = ['Поручитель отчётности', 'Субъект отчётности', 'Администратор']
     if request.method == "POST":
@@ -379,7 +379,7 @@ def UsersList (request):
         message = 'Пользователю ' + str(USER.user.username) + " присвоена роль " + str(ROLE)
         return render(request, 'main_application/READY.html', {"message": message})
     return render(request, 'main_application/AdminPanel/adm_users.html',
-    {"users": users, "roles": roles})
+                  {"users": users, "roles": roles})
 
 
 def CreateUser(request):
@@ -392,9 +392,10 @@ def CreateUser(request):
             acc = UserProfile.objects.create(user=added_user)
             acc.save()
             return redirect('users')
-    return render(request, 'main_application/AdminPanel/create_user.html',{'form': form})
+    return render(request, 'main_application/AdminPanel/create_user.html', {'form': form})
 
-#ПРОБЛЕМА!!!!
+
+# ПРОБЛЕМА!!!!
 def AddOrganisationToUser(request, id):
     organisations = Organisation.objects.all
     user = User.objects.get(id=id)
@@ -407,7 +408,9 @@ def AddOrganisationToUser(request, id):
         account.save()
         message = 'Пользователю ' + str(user) + ' присвоена организация ' + str(organisation)
         return render(request, 'main_application/READY.html', {"message": message})
-    return render(request, 'main_application/AdminPanel/AddOrgToUser-page.html', {"organisations": organisations, "user": user})
+    return render(request, 'main_application/AdminPanel/AddOrgToUser-page.html',
+                  {"organisations": organisations, "user": user})
+
 
 def DeleteUser(request, id):
     user = User.objects.filter(id=id)

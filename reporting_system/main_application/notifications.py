@@ -25,8 +25,8 @@ def ForMenu(request):
             if role_check == 'Субъект отчётности':
                 objectsNEW = Report.objects.filter(status='Новый', organisation__name=USER.organisation)
                 objectsCHANGE = Report.objects.filter(status='Доработать', organisation__name=USER.organisation)
-                objectsUNDER_consideration = Report.objects.filter(status='Рассматривается', organisation__name=USER.organisation)
-                print('&&&&&&&&&&&&&&&&&&&&&&&')
+                objectsUNDER_consideration = Report.objects.filter(status='Рассматривается',
+                                                                   organisation__name=USER.organisation)
                 return {
                     'user_organisation': USER.organisation,
                     'new': objectsNEW.count(),
