@@ -8,8 +8,11 @@
     <link rel="shortcut icon" href="{% static 'images/logo-site.png' %}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+
+
     <style media="screen">
 .elements .movement_of_elements a, .elements .movement_of_elements a:visited {
     transition: padding 0.2s ease-out 0s;
@@ -24,13 +27,39 @@
     resize: both;
 }
     </style>
-</head>
+
+    <style media="screen">
+.elements .movement_of_elements a, .elements .movement_of_elements a:visited {
+    transition: padding 0.2s ease-out 0s;
+}
+.elements a:hover {
+    padding-left: 35px;
+}
+.elements .bright_img a:hover {
+    padding-left: 0;
+}
+.resize {
+    resize: both;
+}
+
+.workzone-zone {
+
+  font-family: 'Raleway', sans-serif;
+}
+
+.myshadow {
+  box-shadow: 0 0 5px;
+}
+    </style>
+
+<link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Andika&display=swap" rel="stylesheet">
 <body>
+
 <div class="container-fluid">
     <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
             <div class="sidebar-sticky">
-                <aside class="elements">
+                <aside class="elements shadow">
                     <div class="movement_of_elements">
                         <ul class="nav flex-column">
                             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
@@ -275,14 +304,13 @@
                     </div>
                 </aside>
             </div>
-        </nav>
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 shadow workzone-zone">
             {% block content%} {% endblock %}
         </main>
     </div>
 </div>
 <div class="fixed-bottom">
-    <footer class="py-4 bg-light text-black-50">
+    <footer class="py-4 bg-light text-black-50 myshadow">
         <div class="container text-center">
             <small>Государственный комитет цифрового развития и связи Республики Хакасия &copy; 2020 Телефон -
                 237-994</small>
