@@ -14,6 +14,7 @@ urlpatterns = [
     path('new_reports/', views.NewReports, name='new_reports-page'),
     path('under-consideration/', views.UnderConsiderationReports, name='under-consideration_reports-page'),
     path('edit/<int:id>', views.AddInfoIntoReport, name='edit-page'),
+    path('choice_group_of_individual', views.ChoiceGroupOrIndividual.as_view(), name='choice_GorI'),
     path('add_report', views.CreateFormReport, name='add_report'),
     path('add_names', views.AddNameToReport, name='add_names'),
     path('check', views.CheckingInfoReport, name='check'),

@@ -1,0 +1,40 @@
+{% extends 'main_application/base.html' %}
+
+{% block title %}
+Выбор типа отчёта
+{% endblock %}
+
+
+{% block content %}
+<div class="container text-center">
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto">
+        <h1 class="display-4"> Выберите тип отчётности</h1>
+    </div>
+    <div class="card-deck mb-3 text-center">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Группа отчётов</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>Создать группу получателей отчётности</li>
+                    <li>с общими именами полей</li>
+                </ul>
+                <button type="button" onclick="location.href='http://time100.ru/'" class="btn btn-lg btn-block btn-outline-primary">Перейти</button>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Индивидуальный отчёт</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>Создать отчёт для</li>
+                    <li>одного субъекта отчётности</li>
+                </ul>
+               <button type="button" onclick="location.href='http://time100.ru/'" class="btn btn-lg btn-block btn-outline-primary">Перейти</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

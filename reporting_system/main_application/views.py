@@ -175,12 +175,16 @@ def ChangeReports(request, id):
 
 
 # Раздел поручителя
-
 class ArchiveReports(LoginRequiredMixin, ListView):
     paginate_by = 5
     model = Report
     template_name = 'main_application/ArchiveReports/archive-reports-page.html'
     raise_exception = True
+
+
+
+class ChoiceGroupOrIndividual(TemplateView):
+    template_name = 'main_application/ArchiveReports/ChoiceGroupOrIndividual-page.html'
 
 
 def CreateFormReport(request):
