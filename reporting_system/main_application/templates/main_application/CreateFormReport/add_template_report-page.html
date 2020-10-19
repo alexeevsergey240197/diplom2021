@@ -6,7 +6,8 @@
 
 {% block content %}
 <div class="text-center">
-    <h1 class="display-4"> Создание формы отчета</h1>
+    <h1 class="display-4">Создание формы отчета</h1>
+    <h5> Для группы "{{ group.name }}"</h5>
 </div>
 <div class="container mt-4">
     <form method="POST">
@@ -15,10 +16,6 @@
             <div class="form-group col-md-6">
                 <label>Наименование</label>
                 {{ form.name }}
-            </div>
-            <div class="form-group col-md-4">
-                <label>Организация</label>
-                {{ form.organisation }}
             </div>
             <div class="form-group col-md-2">
                 <label>Столбцы</label>
@@ -36,7 +33,7 @@
 <p> </p>
     <div class="text-center">
         <div class="alert alert-success" role="alert">
-            <strong>Шаг 1 </strong>Введите основную информацю о отчете
+            <strong>Шаг 3. </strong>Введите основную информацю о отчете
         </div>
     </div>
 </div>

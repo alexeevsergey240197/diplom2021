@@ -182,12 +182,36 @@ class ArchiveReports(LoginRequiredMixin, ListView):
     raise_exception = True
 
 
-
 class ChoiceGroupOrIndividual(TemplateView):
     template_name = 'main_application/ArchiveReports/ChoiceGroupOrIndividual-page.html'
 
+#Сократить код срочно, убрать лишний бред
+def CreateGroup(request):
+    if request.method == 'POST':
+            subjects = request.POST.getlist('subjects')
+            name = request.POST.get('name')
+            group = GroupOfReports()
+            group.name = name
+            group.ListGroups = subjects
+            group.save()
+            return redirect('add_report', id=group.id) # с переменными
+    else:    
+        ListSubjects = Organisation.objects.all
+        values = []
+        count = Organisation.objects.count()
+        for i in range(0, count):
+            name = 'org' + str(i)
+            values.append(name)
+        context = dict()
+        for i in range(0, count):
+            key = values[i]
+            context[key] = Organisation.objects.get(id=i+1)      
+        return render(request, 'main_application/CreateFormReport/CreateGroup-page.html', {'context':context})
 
-def CreateFormReport(request):
+
+
+def CreateFormReport(request, id):
+    group = GroupOfReports.objects.get(id=id)
     form = ReportForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
@@ -198,7 +222,7 @@ def CreateFormReport(request):
             report.save()
             request.session['report_name'] = str(report.name)
         return redirect('add_names')
-    return render(request, 'main_application/CreateFormReport/add_template_report-page.html', {'form': form})
+    return render(request, 'main_application/CreateFormReport/add_template_report-page.html', {'form': form, 'group':group})
 
 
 def AddNameToReport(request):
@@ -213,7 +237,6 @@ def AddNameToReport(request):
         DATAlist = []
         for i in range(0, columns):
             add = str(request.POST.get(inputs[i]))
-            print(add)
             DATAlist.append(add)
         DATAstr = '*#*'.join(DATAlist)
         report.top_names = DATAstr
@@ -259,7 +282,6 @@ def CheckReport(request, id):
             added_message = form.cleaned_data['message_help']
             report.status = added_status
             report.message_help = added_message
-            print(added_status)
             report.save()
             if added_status == 'Сформирован':
                 message = "Отчёт " + str(report.name) + " сформирован и помещен в архив"
@@ -399,11 +421,10 @@ def CreateUser(request):
     return render(request, 'main_application/AdminPanel/create_user.html', {'form': form})
 
 
-# ПРОБЛЕМА!!!!
+
 def AddOrganisationToUser(request, id):
     organisations = Organisation.objects.all
     user = User.objects.get(id=id)
-    print(id)
     if request.method == 'POST':
         account = UserProfile.objects.get(id=id)
         organisation = request.POST.get('organisation')

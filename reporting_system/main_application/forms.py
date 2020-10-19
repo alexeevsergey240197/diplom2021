@@ -21,7 +21,6 @@ class ReportForm(forms.ModelForm):
         model = Report
         fields = (
             'name',
-            'organisation',
             'columns',
             'message'
         )
