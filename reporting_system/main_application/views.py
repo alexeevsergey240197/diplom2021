@@ -58,13 +58,15 @@ def SearchReport(request):
             organisation = request.POST.get('organisation')
             status = request.POST.get('status')
             if organisation == 'Все организации' and status == 'Любой статус':
-                result = Report.objects.filter(start_date__range=[date_start, date_end])
+                result = Report.objects.filter(
+                    start_date__range=[date_start, date_end])
                 count = result.count()
                 count = int(count)
                 return render(request, 'main_application/SearchReport/result-page.html', {"reports": result,
                                                                                           "count": count})
             elif organisation == 'Все организации' and status != 'Любой статус':
-                result = Report.objects.filter(start_date__range=[date_start, date_end], status=status)
+                result = Report.objects.filter(
+                    start_date__range=[date_start, date_end], status=status)
                 return render(request, 'main_application/search-report.html', {"reports": result,
                                                                                "count": count})
             elif organisation != 'Все организации' and status != 'Любой статус':
@@ -93,7 +95,8 @@ class AllReportsOfOrganisation(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         USER = UserProfile.objects.get(user=self.request.user)
-        list_reports = Report.objects.filter(organisation__name=USER.organisation)
+        list_reports = Report.objects.filter(
+            organisation__name=USER.organisation)
         queryset = list_reports
 
         return queryset
@@ -101,19 +104,22 @@ class AllReportsOfOrganisation(LoginRequiredMixin, ListView):
 
 def NewReports(request):
     USER = UserProfile.objects.get(user=request.user)
-    list_reports = Report.objects.filter(status='Новый', organisation__name=USER.organisation)
+    list_reports = Report.objects.filter(
+        status='Новый', organisation__name=USER.organisation)
     return render(request, 'main_application/new_reports_list-page.html', {'list_reports': list_reports})
 
 
 def UnderConsiderationReports(request):
     USER = UserProfile.objects.get(user=request.user)
-    list_reports = Report.objects.filter(status='Рассматривается', organisation__name=USER.organisation)
+    list_reports = Report.objects.filter(
+        status='Рассматривается', organisation__name=USER.organisation)
     return render(request, 'main_application/under_consideration_reports_list.html', {'list_reports': list_reports})
 
 
 def NeedChangeReports(request):
     USER = UserProfile.objects.get(user=request.user)
-    list_reports = Report.objects.filter(status='Доработать', organisation__name=USER.organisation)
+    list_reports = Report.objects.filter(
+        status='Доработать', organisation__name=USER.organisation)
     return render(request, 'main_application/need_change_reports_list.html', {'list_reports': list_reports})
 
 
@@ -140,8 +146,9 @@ def AddInfoIntoReport(request, id):
         DATAstr = "*#*".join(DATAlist)
         report.context = DATAstr
         report.status = "Рассматривается"
+        message = "Отчёт заполнен, ожидайте проверки"
         report.save()
-        return HttpResponseRedirect("/")
+        return render(request, 'main_application/READY.html', {"message": message})
     else:
         return render(request, 'main_application/edit_report-page.html', context)
 
@@ -182,20 +189,27 @@ class ArchiveReports(LoginRequiredMixin, ListView):
     raise_exception = True
 
 
+def GpoupsPage(request):
+    groups = GroupOfReports.objects.all
+    return render(request, 'main_application/groups-page.html', {'groups':groups})
+
+
 class ChoiceGroupOrIndividual(TemplateView):
     template_name = 'main_application/ArchiveReports/ChoiceGroupOrIndividual-page.html'
 
-#Сократить код срочно, убрать лишний бред
+# Сократить код срочно, убрать лишний бред
+
+
 def CreateGroup(request):
     if request.method == 'POST':
-            subjects = request.POST.getlist('subjects')
-            name = request.POST.get('name')
-            group = GroupOfReports()
-            group.name = name
-            group.ListGroups = subjects
-            group.save()
-            return redirect('add_report', id=group.id) # с переменными
-    else:    
+        subjects = request.POST.getlist('subjects')
+        name = request.POST.get('name')
+        group = GroupOfReports()
+        group.name = name
+        group.ListGroups = subjects
+        group.save()
+        return redirect('add_report', id=group.id)  # с переменными
+    else:
         ListSubjects = Organisation.objects.all
         values = []
         count = Organisation.objects.count()
@@ -205,9 +219,8 @@ def CreateGroup(request):
         context = dict()
         for i in range(0, count):
             key = values[i]
-            context[key] = Organisation.objects.get(id=i+1)      
-        return render(request, 'main_application/CreateFormReport/CreateGroup-page.html', {'context':context})
-
+            context[key] = Organisation.objects.get(id=i+1)
+        return render(request, 'main_application/CreateFormReport/CreateGroup-page.html', {'context': context})
 
 
 def CreateFormReport(request, id):
@@ -215,19 +228,30 @@ def CreateFormReport(request, id):
     form = ReportForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
             name = form.cleaned_data['name']
-            report = Report.objects.get(name=name)
-            report.status = 'Новый'
-            report.save()
-            request.session['report_name'] = str(report.name)
-        return redirect('add_names')
-    return render(request, 'main_application/CreateFormReport/add_template_report-page.html', {'form': form, 'group':group})
+            columns = form.cleaned_data['columns']
+            message = form.cleaned_data['message']
+            listGROUPS = group.ListGroups
+            N = len(listGROUPS)
+            for i in range(0, N):
+                report = Report()
+                report.name = name
+                report.columns = columns
+                report.message = message
+                report.group = group
+                report.status = "Новый"
+                organisation = Organisation.objects.get(
+                    name=str(listGROUPS[i]))
+                report.organisation = organisation
+                report.save()
+        return redirect('add_names', id=group.id)
+    return render(request, 'main_application/CreateFormReport/add_template_report-page.html', {'form': form, 'group': group})
 
 
-def AddNameToReport(request):
-    name = request.session['report_name']
-    report = Report.objects.get(name=name)
+def AddNameToReport(request, id):
+    reports = Report.objects.filter(group__id=id).values_list('id', flat=True)
+    print(reports)
+    report = Report.objects.get(id=reports[0])
     columns = report.columns
     inputs = []
     for i in range(0, columns):
@@ -239,25 +263,40 @@ def AddNameToReport(request):
             add = str(request.POST.get(inputs[i]))
             DATAlist.append(add)
         DATAstr = '*#*'.join(DATAlist)
-        report.top_names = DATAstr
-        report.save()
-        return redirect('check')
+        N = len(reports)
+        for i in range(0, N):
+            report = Report.objects.get(id=reports[i])
+            report.top_names = DATAstr
+            report.save()
+        return redirect('check', id=id)
     else:
         return render(request, 'main_application/CreateFormReport/add_top_names-page.html',
                       {'inputs': inputs, 'report': report})
 
 
-def CheckingInfoReport(request):
-    name = request.session['report_name']
-    report = Report.objects.get(name=name)
+def CheckingInfoReport(request, id):
+    group = GroupOfReports.objects.get(id=id)
+    reports = Report.objects.filter(group__id=id).values_list('id', flat=True)
+    report = Report.objects.get(id=reports[0])
     contextTABLE = report.top_names.split('*#*')
     return render(request, 'main_application/CreateFormReport/check-info-report-page.html',
-                  {'report': report, 'contextTABLE': contextTABLE})
+                  {'report': report, 'contextTABLE': contextTABLE, "group": group})
 
+
+def DeleteGroup(request, id):
+    group = GroupOfReports.objects.get(id=id)
+    message = 'Группа ' + str(group.name) + ' удалён'
+    group.delete()
+    return render(request, 'main_application/READY.html', {"message": message})
 
 def DeleteReport(request, id):
     report = Report.objects.get(id=id)
-    message = 'Отчёт ' + str(report.name) + ' удалён'
+    group = GroupOfReports.objects.get(name=report.group)
+    list_of_subjects = list(group.ListGroups)
+    list_of_subjects.remove(str(report.organisation))
+    group.ListGroups = list_of_subjects
+    message = 'Отчёт ' + str(report.name) + ' удалён, он был в группе ' + str(group.name)
+    group.save()
     report.delete()
     return render(request, 'main_application/READY.html', {"message": message})
 
@@ -284,9 +323,12 @@ def CheckReport(request, id):
             report.message_help = added_message
             report.save()
             if added_status == 'Сформирован':
-                message = "Отчёт " + str(report.name) + " сформирован и помещен в архив"
+                message = "Отчёт " + str(report.name) + \
+                    " сформирован и помещен в архив"
             else:
-                message = 'Статус "' + str(added_status) + '" присвоен для отчёта: ' + str(report.name)
+                message = 'Статус "' + \
+                    str(added_status) + \
+                    '" присвоен для отчёта: ' + str(report.name)
             return render(request, 'main_application/READY.html', {"message": message})
     return render(request, 'main_application/check_report-page.html', context)
 
@@ -402,7 +444,8 @@ def UsersList(request):
         USER = UserProfile.objects.get(id=id)
         USER.role = ROLE
         USER.save()
-        message = 'Пользователю ' + str(USER.user.username) + " присвоена роль " + str(ROLE)
+        message = 'Пользователю ' + \
+            str(USER.user.username) + " присвоена роль " + str(ROLE)
         return render(request, 'main_application/READY.html', {"message": message})
     return render(request, 'main_application/AdminPanel/adm_users.html',
                   {"users": users, "roles": roles})
@@ -421,7 +464,6 @@ def CreateUser(request):
     return render(request, 'main_application/AdminPanel/create_user.html', {'form': form})
 
 
-
 def AddOrganisationToUser(request, id):
     organisations = Organisation.objects.all
     user = User.objects.get(id=id)
@@ -431,7 +473,8 @@ def AddOrganisationToUser(request, id):
         organisationObj = Organisation.objects.get(name=organisation)
         organisationObj.userprofile = account
         account.save()
-        message = 'Пользователю ' + str(user) + ' присвоена организация ' + str(organisation)
+        message = 'Пользователю ' + \
+            str(user) + ' присвоена организация ' + str(organisation)
         return render(request, 'main_application/READY.html', {"message": message})
     return render(request, 'main_application/AdminPanel/AddOrgToUser-page.html',
                   {"organisations": organisations, "user": user})

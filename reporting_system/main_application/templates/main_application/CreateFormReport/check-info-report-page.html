@@ -11,18 +11,28 @@
         <h1 class="display-4">Проверка формы</h1>
     </div>
     <div class="list-group list-group-flush">
-        <li class="list-group-item"><strong>Наименование:</strong> {{report.name}}</li>
-        <li class="list-group-item"><strong>Организация:</strong> {{report.organisation}}</li>
+        <li class="list-group-item"><strong>Общее наименование отчётов:</strong> {{report.name}}</li>
+        <li class="list-group-item"><strong>Группа отчётов:</strong> {{group.name}}</li>
         <li class="list-group-item"><strong>Дата создания:</strong> {{report.start_date}}</li>
-        <li class="list-group-item"><strong>ID:</strong> {{report.id}}</li>
+        <li class="list-group-item">
+            <form class="was-validated" method="POST">
+                <b>
+                    <div class="custom-control custom-checkbox mb-3">
+                        <input type="checkbox" class="custom-control-input" id="customControlValidation1" required>
+                        <label class="custom-control-label" for="customControlValidation1">Активность группы</label>
+                        <div class="invalid-feedback">Подтвердите активность группы</div>
+                    </div>
+                </b>
+            </form>
+        </li>
     </div>
     <div class="text-center">
         <strong>Наименования заголовков:</strong>
     </div>
     <table class="table table-bordered mt-4">
         <tr>
-            {%for context in contextTABLE%}
-            <td>{{context}}</td>
+            {%for field in contextTABLE%}
+            <td>{{field}}</td>
             {% endfor %}
         </tr>
     </table>
@@ -30,20 +40,21 @@
         <div class="bd-example">
             <strong>Сообщение:</strong> <span class="border-0">{{report.message}}</span>
         </div>
-        </div>
-        <div class="text-center">
+    </div>
+    <div class="text-center">
         <div class="alert alert-success" role="alert">
-            <strong>Шаг 3 </strong>Проверьте информацию о отчете
+            <strong>Шаг 3. </strong>Проверьте информацию о отчете
         </div>
         <div class="row justify-content-around">
             <div class="col-4">
                 <a href="{% url 'sended_reports' %}">
-                    <button type="submit" class="btn btn-outline-success">Сохранить</button>
+                    <button type="submit" class="btn btn-outline-success">Подтвердить сохранение</button>
                 </a>
             </div>
             <div class="col-4">
-                <a href="delete/{{report.id}}">
-                    <button class="btn btn-outline-danger">Удалить</button>
+
+                <a href="{% url 'delete_group' group.id %}">
+                <button class="btn btn-outline-danger">Удалить группу отчётов</button>
                 </a>
             </div>
         </div>
