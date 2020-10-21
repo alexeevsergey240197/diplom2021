@@ -193,6 +193,10 @@ def GpoupsPage(request):
     groups = GroupOfReports.objects.all
     return render(request, 'main_application/groups-page.html', {'groups':groups})
 
+def ReportsOfGroup(request, id):
+    reports = Report.objects.filter(group__id=id)
+    group = GroupOfReports.objects.get(id=id)
+    return render(request,'main_application/reports-of-group.html',{'reports':reports,'group':group})
 
 class ChoiceGroupOrIndividual(TemplateView):
     template_name = 'main_application/ArchiveReports/ChoiceGroupOrIndividual-page.html'

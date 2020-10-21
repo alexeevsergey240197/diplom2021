@@ -17,6 +17,8 @@ urlpatterns = [
     path('groups/', views.GpoupsPage, name='groups-page'),
     path('choice_group_of_individual', views.ChoiceGroupOrIndividual.as_view(), name='choice_GorI'),
     path('create_group', views.CreateGroup, name='create_group'),
+    path('reports_of_group/<int:id>', views.ReportsOfGroup, name='reports_of_group'),
+
     path('add_report/<int:id>', views.CreateFormReport, name='add_report'),
     path('add_names/<int:id>', views.AddNameToReport, name='add_names'),
     path('check/<int:id>', views.CheckingInfoReport, name='check'),
