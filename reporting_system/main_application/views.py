@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from django.contrib import auth
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
+from django.db.models import Q
 
 from .forms import *
 from .models import *
@@ -87,7 +88,7 @@ def SearchReport(request):
 
 # Раздел редактирование субъектом отчета
 class AllReportsOfOrganisation(LoginRequiredMixin, ListView):
-    paginate_by = 5
+    paginate_by = 10
     model = Report
     context_object_name = 'reports'
     template_name = 'main_application/ArchiveReports/all-reports-of-organisation.html'
@@ -125,7 +126,6 @@ def NeedChangeReports(request):
 
 def AddInfoIntoReport(request, id):
     report = Report.objects.get(id=id)
-    top = report.top_names.split('*#*')
     names_for_input = []
     columns = report.columns
     for i in range(0, columns):
@@ -134,7 +134,7 @@ def AddInfoIntoReport(request, id):
     context = {
         "report": report,
         'context': report.top_names,
-        'top': top,
+        'top': report.top_names,
         'inputs': names_for_input,
         'message': report.message
     }
@@ -143,8 +143,7 @@ def AddInfoIntoReport(request, id):
         for i in range(0, columns):
             add = request.POST.get(names_for_input[i])
             DATAlist.append(add)
-        DATAstr = "*#*".join(DATAlist)
-        report.context = DATAstr
+        report.context = DATAlist
         report.status = "Рассматривается"
         message = "Отчёт заполнен, ожидайте проверки"
         report.save()
@@ -191,19 +190,46 @@ class ArchiveReports(LoginRequiredMixin, ListView):
 
 def GpoupsPage(request):
     groups = GroupOfReports.objects.all
-    return render(request, 'main_application/groups-page.html', {'groups':groups})
+    return render(request, 'main_application/groups-page.html', {'groups': groups})
+
+# Сократить немного
+def TableForExcel(request, id):
+    group = GroupOfReports.objects.get(id=id)
+    reports = Report.objects.filter(group__name=group.name)
+    report = reports[0]
+    name_report = []
+    name_report.append(str(report.name))
+    subjects = list(group.ListGroups)
+    top_names = []
+    top_names.append(str(report.name))
+    top_names = top_names + list(report.top_names)
+    context = []
+    orgs = list(Report.objects.filter(group__name=group.name).values_list('context', flat=True))
+    orgs = list(orgs)
+    print(orgs)
+    for i in range(0, len(subjects)):
+        a = orgs[i]
+        a = a.split(',')
+        context.append(a)      
+    dic = {
+    'columns': top_names,
+    'headers': subjects,
+    'data': context}
+    rows = [dic['columns']] + list(map(lambda x: [x[0], *x[1]], zip(dic['headers'], dic['data'])))
+    return render(request, 'main_application/excel-page.html',{'rows':rows, 'group': group})
+
 
 def ReportsOfGroup(request, id):
     reports = Report.objects.filter(group__id=id)
     group = GroupOfReports.objects.get(id=id)
-    return render(request,'main_application/reports-of-group.html',{'reports':reports,'group':group})
+    return render(request, 'main_application/reports-of-group.html', {'reports': reports, 'group': group})
+
 
 class ChoiceGroupOrIndividual(TemplateView):
     template_name = 'main_application/ArchiveReports/ChoiceGroupOrIndividual-page.html'
 
+
 # Сократить код срочно, убрать лишний бред
-
-
 def CreateGroup(request):
     if request.method == 'POST':
         subjects = request.POST.getlist('subjects')
@@ -252,9 +278,8 @@ def CreateFormReport(request, id):
     return render(request, 'main_application/CreateFormReport/add_template_report-page.html', {'form': form, 'group': group})
 
 
-def AddNameToReport(request, id):
+def AddTopNameSToReport(request, id):
     reports = Report.objects.filter(group__id=id).values_list('id', flat=True)
-    print(reports)
     report = Report.objects.get(id=reports[0])
     columns = report.columns
     inputs = []
@@ -266,11 +291,10 @@ def AddNameToReport(request, id):
         for i in range(0, columns):
             add = str(request.POST.get(inputs[i]))
             DATAlist.append(add)
-        DATAstr = '*#*'.join(DATAlist)
         N = len(reports)
         for i in range(0, N):
             report = Report.objects.get(id=reports[i])
-            report.top_names = DATAstr
+            report.top_names = DATAlist
             report.save()
         return redirect('check', id=id)
     else:
@@ -282,9 +306,8 @@ def CheckingInfoReport(request, id):
     group = GroupOfReports.objects.get(id=id)
     reports = Report.objects.filter(group__id=id).values_list('id', flat=True)
     report = Report.objects.get(id=reports[0])
-    contextTABLE = report.top_names.split('*#*')
     return render(request, 'main_application/CreateFormReport/check-info-report-page.html',
-                  {'report': report, 'contextTABLE': contextTABLE, "group": group})
+                  {'report': report, 'contextTABLE': report.top_names, "group": group})
 
 
 def DeleteGroup(request, id):
@@ -293,13 +316,15 @@ def DeleteGroup(request, id):
     group.delete()
     return render(request, 'main_application/READY.html', {"message": message})
 
+
 def DeleteReport(request, id):
     report = Report.objects.get(id=id)
     group = GroupOfReports.objects.get(name=report.group)
     list_of_subjects = list(group.ListGroups)
     list_of_subjects.remove(str(report.organisation))
     group.ListGroups = list_of_subjects
-    message = 'Отчёт ' + str(report.name) + ' удалён, он был в группе ' + str(group.name)
+    message = 'Отчёт ' + str(report.name) + \
+        ' удалён, он был в группе ' + str(group.name)
     group.save()
     report.delete()
     return render(request, 'main_application/READY.html', {"message": message})
@@ -313,12 +338,10 @@ def CheckReportsList(request):
 def CheckReport(request, id):
     form = CheckReportForm(request.POST)
     report = Report.objects.get(id=id)
-    contextTABLE = report.context.split('*#*')
-    namesTABLE = report.top_names.split('*#*')
     context = {'report': report,
                'form': form,
-               'namesTABLE': namesTABLE,
-               'contextTABLE': contextTABLE}
+               'namesTABLE': report.top_names,
+               'contextTABLE': report.context}
     if request.method == 'POST':
         if form.is_valid():
             added_status = form.cleaned_data['status']
@@ -344,9 +367,7 @@ def SendedReports(request):
 
 # Настройка своего аккаунта
 def SettingsAccount(request):
-    username = request.user
-    user = UserProfile.objects.get(user=username)
-    return render(request, 'main_application/SettingsUser/settings_account-page.html', {'user': user})
+    return render(request, 'main_application/SettingsUser/settings_account-page.html', {'user': UserProfile.objects.get(user=request.user)})
 
 
 def ChangeName(request, id):
@@ -371,10 +392,9 @@ def ChangeEmail(request, id):
         return redirect('login_page')
     else:
         form = SettingsUser(request.POST)
-        userNOW = request.user
-        userID = User.objects.get(id=id)
+        userNOW = request.user #сейчас сидит
         user_info = UserProfile.objects.get(id=id)
-        if str(userNOW) == str(userID.username):
+        if str(userNOW) == str(user_info.user.username):
             if request.method == 'POST':
                 if form.is_valid():
                     user_info.email = form.cleaned_data['email']
@@ -391,9 +411,8 @@ def ChangePhone(request, id):
         return redirect('login_page')
     else:
         userNOW = request.user
-        userID = User.objects.get(id=id)
         user_info = UserProfile.objects.get(id=id)
-        if str(userNOW) == str(userID.username):
+        if str(userNOW) == str(user_info.user.username):
             if request.method == 'POST':
                 user_info.phone_number = request.POST.get('phone')
                 user_info.save()
