@@ -1,38 +1,58 @@
 <!DOCTYPE html>
-<html lang="ru">
+{% load static %}
+<html>
 
 <head>
-    <meta charset="utf-8">
-    <title>{{ group.name }}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-	<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <title>{{ group.name }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+
+
+
+    <script type="text/javascript" src="{% static 'DataTables/site.js.Без названия' %}"></script>
+
+    <script type="text/javascript" src="{% static 'DataTables/jquery.dataTables.min.js.Без названия' %}"></script>
+
+    <script type="text/javascript" src="{% static 'DataTables/dataTables.buttons.min.js.Без названия' %}"></script>
+
+    <script type="text/javascript" src="{% static 'DataTables/jszip.min.js.Без названия' %}"></script>
+
+
+    <script type="text/javascript" src="{% static 'DataTables/buttons.html5.min.js.Без названия' %}"></script>
+
+
 
     <script type="text/javascript" class="init">
         $(document).ready(function () {
             $('#example').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
-                    'copyHtml5',
-                    'excelHtml5',
-                    'csvHtml5',
-                    'pdfHtml5'
+                    'excelHtml5'
                 ]
             });
         });
     </script>
 </head>
 
-<body style="overflow: scroll">
-    <a href="{% url 'groups-page' %}">НАЗАД</a>
-    <table class="table table-bordered mt-4" id="example">
-        <tbody>
+<body>
+    <div class="text-center">
+        <h1 class="display-4">Общий результат группы</h1>
+    </div>
+    <h5> <a href="{% url 'groups-page' %}">К списку групп ᐊᐊᐊ </a></h5>
+    <div class="mt-4">
+        <table id="example" class="table table-bordered mt-4" style="width: 100%;">
+            <thead>
+                <tr>
+                    {% for number in numbers %}
+                    <td>
+                        {{ number }}
+                    </td>
+                    {% endfor %}
+                </tr>
+            </thead>
             {% for row in rows %}
             <tr>
                 {% for col in row %}
@@ -42,11 +62,8 @@
                 {% endfor %}
             </tr>
             {% endfor %}
-        </tbody>
-    </table>
-    <button class="dt-button buttons-excel buttons-html5" tabindex="0" aria-controls="example" type="button"><span>Excel</span></button>
-
-    
+        </table>
+    </div>
 </body>
 
 </html>

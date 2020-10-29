@@ -193,6 +193,8 @@ def GpoupsPage(request):
     return render(request, 'main_application/groups-page.html', {'groups': groups})
 
 # Сократить немного
+
+
 def TableForExcel(request, id):
     group = GroupOfReports.objects.get(id=id)
     reports = Report.objects.filter(group__name=group.name)
@@ -204,19 +206,23 @@ def TableForExcel(request, id):
     top_names.append(str(report.name))
     top_names = top_names + list(report.top_names)
     context = []
-    orgs = list(Report.objects.filter(group__name=group.name).values_list('context', flat=True))
+    orgs = list(Report.objects.filter(
+        group__name=group.name).values_list('context', flat=True))
     orgs = list(orgs)
-    print(orgs)
     for i in range(0, len(subjects)):
         a = orgs[i]
         a = a.split(',')
-        context.append(a)      
+        context.append(a)
     dic = {
-    'columns': top_names,
-    'headers': subjects,
-    'data': context}
-    rows = [dic['columns']] + list(map(lambda x: [x[0], *x[1]], zip(dic['headers'], dic['data'])))
-    return render(request, 'main_application/excel-page.html',{'rows':rows, 'group': group})
+        'columns': top_names,
+        'headers': subjects,
+        'data': context}
+    rows = [dic['columns']] + \
+        list(map(lambda x: [x[0], *x[1]], zip(dic['headers'], dic['data'])))
+    numbers = ['Номера заголовков:']
+    for i in range(1, len(top_names)):
+        numbers.append(str(i))
+    return render(request, 'main_application/excel-page.html', {'rows': rows, 'group': group, 'numbers': numbers})
 
 
 def ReportsOfGroup(request, id):
@@ -392,7 +398,7 @@ def ChangeEmail(request, id):
         return redirect('login_page')
     else:
         form = SettingsUser(request.POST)
-        userNOW = request.user #сейчас сидит
+        userNOW = request.user  # сейчас сидит
         user_info = UserProfile.objects.get(id=id)
         if str(userNOW) == str(user_info.user.username):
             if request.method == 'POST':
