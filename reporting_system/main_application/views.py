@@ -427,9 +427,8 @@ def ChangePhone(request, id):
                           {'user': user_info})
         else:
             raise Http404('Нет доступа')
-
-
 # админка
+
 
 def AdminOrganisations(request):
     all_organisations = Organisation.objects.all
