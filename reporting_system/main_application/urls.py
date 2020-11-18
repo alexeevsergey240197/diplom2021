@@ -15,7 +15,6 @@ urlpatterns = [
     path('under-consideration/', views.UnderConsiderationReports, name='under-consideration_reports-page'),
     path('edit/<int:id>', views.AddInfoIntoReport, name='edit-page'),
     path('groups/', views.GpoupsPage, name='groups-page'),
-    #вот она пешка навального тут
     path('table_excel_download/<int:id>', views.TableForExcel, name='table_excel'),
     path('choice_group_of_individual', views.ChoiceGroupOrIndividual.as_view(), name='choice_GorI'),
     path('create_group', views.CreateGroup, name='create_group'),

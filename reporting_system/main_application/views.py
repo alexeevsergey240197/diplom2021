@@ -193,8 +193,6 @@ def GpoupsPage(request):
     return render(request, 'main_application/groups-page.html', {'groups': groups})
 
 # Сократить немного
-
-
 def TableForExcel(request, id):
     group = GroupOfReports.objects.get(id=id)
     reports = Report.objects.filter(group__name=group.name)
@@ -281,7 +279,8 @@ def CreateFormReport(request, id):
                 report.organisation = organisation
                 report.save()
         return redirect('add_names', id=group.id)
-    return render(request, 'main_application/CreateFormReport/add_template_report-page.html', {'form': form, 'group': group})
+    return render(request, 'main_application/CreateFormReport/add_template_report-page.html',
+     {'form': form, 'group': group})
 
 
 def AddTopNameSToReport(request, id):
