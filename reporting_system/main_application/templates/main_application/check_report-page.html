@@ -14,11 +14,13 @@
             <th scope="col">{{name}}</th>
             {% endfor %}
         </tr>
-        <tr>
+     
             {%for context in contextTABLE%}
+            {% if not forloop.counter|divisibleby:report.columns %}<tr>{% endif %}
             <td> {{context}}</td>
+            {% if  forloop.counter|divisibleby:report.columns %}</tr>{% endif %}
             {% endfor %}
-        </tr>
+            
     </table>
     <p class="h4"> Сообщение для для субъекта отчетности </p> <small class="text-muted"> Дата обновления отчета:
     {{report.update_time}}</small>

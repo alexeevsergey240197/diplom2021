@@ -1,3 +1,3 @@
-pip install django-separatedvaluesfield
-pip install django-utils-six
-pip install pylint-django
+pip install django-separatedvaluesfield это для того чтобы списки в бд заносить можно было
+pip install django-utils-six а это тоже важно но не ебу зачем
+pip install pylint-django ну понятно

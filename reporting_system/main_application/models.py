@@ -34,6 +34,7 @@ class Report(models.Model):
     message = models.TextField('Приложенное сообщение', max_length=600, default='')
     message_help = models.TextField('Сообщение для помощи', max_length=600, default='', blank=True)
     group = models.ForeignKey(GroupOfReports, on_delete=models.CASCADE)
+    additional_field = models.IntegerField('Дополнительные поля',  default=0)
 
 
     def __str__(self):

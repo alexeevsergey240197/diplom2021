@@ -124,10 +124,16 @@ def NeedChangeReports(request):
     return render(request, 'main_application/need_change_reports_list.html', {'list_reports': list_reports})
 
 
+
+
 def AddInfoIntoReport(request, id):
     report = Report.objects.get(id=id)
-    names_for_input = []
-    columns = report.columns
+    names_for_input = [] 
+    FIELSD = report.additional_field
+    if FIELSD == 0:
+        FIELSD = 1
+    columns = FIELSD * report.columns
+
     for i in range(0, columns):
         name_input = 'input' + str(i)
         names_for_input.append(name_input)
@@ -139,15 +145,21 @@ def AddInfoIntoReport(request, id):
         'message': report.message
     }
     if request.method == "POST":
-        DATAlist = []
-        for i in range(0, columns):
-            add = request.POST.get(names_for_input[i])
-            DATAlist.append(add)
-        report.context = DATAlist
-        report.status = "Рассматривается"
-        message = "Отчёт заполнен, ожидайте проверки"
-        report.save()
-        return render(request, 'main_application/READY.html', {"message": message})
+        if 'fields' in request.POST:
+            report.additional_field = int(request.POST['fields']) + int(1)
+            report.save()
+
+            return redirect('edit-page', id=id)
+        else:
+            DATAlist = []
+            for i in range(0, columns):
+                add = request.POST.get(names_for_input[i])
+                DATAlist.append(add)
+            report.context = DATAlist
+            report.status = "Рассматривается"
+            message = "Отчёт заполнен, ожидайте проверки"
+            report.save()
+            return render(request, 'main_application/READY.html', {"message": message})         
     else:
         return render(request, 'main_application/edit_report-page.html', context)
 
