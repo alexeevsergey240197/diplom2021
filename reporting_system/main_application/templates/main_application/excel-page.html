@@ -1,3 +1,4 @@
+z
 <!DOCTYPE html>
 {% load static %}
 <html>
@@ -25,22 +26,27 @@
     <script type="text/javascript" src="{% static 'DataTables/buttons.html5.min.js.Без названия' %}"></script>
 
 
-
     <script type="text/javascript" class="init">
         $(document).ready(function () {
             $('#example').DataTable({
                 dom: 'Bfrtip',
-                buttons: [
-                    'excelHtml5'
-              ]
+                "bSort": false,
+                bFilter: false,
+                buttons: [{
+                    extend: 'excelHtml5',
+                    autoFilter: false,
+                    sheetName: 'Exported data'
+                }]
             });
         });
+
     </script>
 </head>
 
-<body> <script type="text/javascript" src="{% static 'DataTables/site.js.Без названия' %}"></script>
+<body>
+    <script type="text/javascript" src="{% static 'DataTables/site.js.Без названия' %}"></script>
 
-  
+
 
     <script type="text/javascript" src="{% static 'DataTables/dataTables.buttons.min.js.Без названия' %}"></script>
 
@@ -52,12 +58,6 @@
     </div>
     <h5> <a href="{% url 'groups-page' %}">К списку групп ᐊᐊᐊ </a></h5>
     <div class="mt-4">
-        
-
-     
-
-
-
         <table id="example" class="table table-bordered mt-4" style="width: 100%;">
             <thead>
                 <tr>
@@ -68,26 +68,29 @@
                     {% endfor %}
                 </tr>
             </thead>
-           
+
             {% for report in reports %}
-            <tr> 
+            <tr>
                 <td>{{ report.organisation  }}</td>
                 <td>-</td>
                 <td>-</td>
-                
+
                 {% for part in report.context %}
 
-                {% if not forloop.counter|divisibleby:report.columns %}<tr> <td>-</td> {% endif %}
+                {% if not forloop.counter|divisibleby:report.columns %}
+            <tr>
+                <td>-</td> {% endif %}
                 <td> {{ part }}</td>
-                {% if  forloop.counter|divisibleby:report.columns %}</tr>{% endif %}
-                {% endfor %}
-            </tr>
-       
+                {% if  forloop.counter|divisibleby:report.columns %}
+            </tr>{% endif %}
             {% endfor %}
-           
+            </tr>
+
+            {% endfor %}
+
         </table>
-       
-     
+
+
     </div>
 </body>
 
