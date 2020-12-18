@@ -1,4 +1,3 @@
-z
 <!DOCTYPE html>
 {% load static %}
 <html>
@@ -9,10 +8,6 @@ z
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
     <title>{{ group.name }}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-
-
-
-
 
     <script type="text/javascript" src="{% static 'DataTables/site.js.Без названия' %}"></script>
 
@@ -35,7 +30,7 @@ z
                 buttons: [{
                     extend: 'excelHtml5',
                     autoFilter: false,
-                    sheetName: 'Exported data'
+                    
                 }]
             });
         });

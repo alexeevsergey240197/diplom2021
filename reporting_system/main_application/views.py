@@ -13,7 +13,6 @@ from .forms import *
 from .models import *
 
 
-# ДОБАВИТЬ в каждую функцию проверку логина
 # Общий программный код
 def Logout(request):
     auth.logout(request)
@@ -204,7 +203,7 @@ def GpoupsPage(request):
     groups = GroupOfReports.objects.all
     return render(request, 'main_application/groups-page.html', {'groups': groups})
 
-# Сократить немного
+
 def TableForExcel(request, id):
     group = GroupOfReports.objects.get(id=id)
     reports = Report.objects.filter(group__name=group.name)
@@ -233,7 +232,7 @@ class ChoiceGroupOrIndividual(TemplateView):
     template_name = 'main_application/ArchiveReports/ChoiceGroupOrIndividual-page.html'
 
 
-# Сократить код срочно, убрать лишний бред
+
 def CreateGroup(request):
     if request.method == 'POST':
         subjects = request.POST.getlist('subjects')
