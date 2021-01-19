@@ -20,7 +20,7 @@ def Logout(request):
 
 
 class LoginView(LoginView):
-    template_name = 'main_application/login-page.html'
+    template_name = 'main_application/GENEREL_PURPOSE/login-page.html'
     form_class = AuthUserForm
     success_url = reverse_lazy('main-page')
 
@@ -29,7 +29,7 @@ class LoginView(LoginView):
 
 
 def MainPage(request):
-    template_name = 'main_application/main-page.html'
+    template_name = 'main_application/GENEREL_PURPOSE/main-page.html'
     if not request.user.is_authenticated:
         return redirect('login_page')
     else:
@@ -37,13 +37,14 @@ def MainPage(request):
 
 
 class HelpPage(LoginRequiredMixin, TemplateView):
-    template_name = 'main_application/Help/help-page.html'
+    template_name = 'main_application/GENEREL_PURPOSE/Help/help-page.html'
     raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
 
+# Переделат, сократить
 
 def SearchReport(request):
     if not request.user.is_authenticated:
@@ -62,35 +63,35 @@ def SearchReport(request):
                     start_date__range=[date_start, date_end])
                 count = result.count()
                 count = int(count)
-                return render(request, 'main_application/SearchReport/result-page.html', {"reports": result,
+                return render(request, 'main_application/ROLE_report_collector/SearchReport/result-page.html', {"reports": result,
                                                                                           "count": count})
             elif organisation == 'Все организации' and status != 'Любой статус':
                 result = Report.objects.filter(
                     start_date__range=[date_start, date_end], status=status)
-                return render(request, 'main_application/search-report.html', {"reports": result,
+                return render(request, 'main_application/ROLE_report_collector/SearchReport/result-page.html', {"reports": result,
                                                                                "count": count})
             elif organisation != 'Все организации' and status != 'Любой статус':
                 result = Report.objects.filter(start_date__range=[date_start, date_end],
                                                status=status,
                                                organisation__name=organisation)
-                return render(request, 'main_application/search-report.html', {"reports": result,
+                return render(request, 'main_application/ROLE_report_collector/SearchReport/result-page.html', {"reports": result,
                                                                                "count": count})
             else:
-                return render(request, 'main_application/search-report.html', {})
+                return render(request, 'main_application/ROLE_report_collector/SearchReport/result-page.html', {})
         else:
-            return render(request, 'main_application/SearchReport/search-report.html', {
+            return render(request, 'main_application/ROLE_report_collector/SearchReport/search-report.html', {
                 'organisation_list': organisations,
                 'statuses': statuses,
                 'count': count
-            })  # Переделать
+            })
 
 
 # Раздел редактирование субъектом отчета
 class AllReportsOfOrganisation(LoginRequiredMixin, ListView):
-    paginate_by = 10
+    paginate_by = 20
     model = Report
     context_object_name = 'reports'
-    template_name = 'main_application/ArchiveReports/all-reports-of-organisation.html'
+    template_name = 'main_application/ROLE_subject/ArchiveReports/all-reports-of-organisation.html'
     raise_exception = True
 
     def get_queryset(self):
@@ -98,7 +99,6 @@ class AllReportsOfOrganisation(LoginRequiredMixin, ListView):
         list_reports = Report.objects.filter(
             organisation__name=USER.organisation)
         queryset = list_reports
-
         return queryset
 
 
@@ -106,48 +106,43 @@ def NewReports(request):
     USER = UserProfile.objects.get(user=request.user)
     list_reports = Report.objects.filter(
         status='Новый', organisation__name=USER.organisation)
-    return render(request, 'main_application/new_reports_list-page.html', {'list_reports': list_reports})
+    return render(request, 'main_application/ROLE_subject/new_reports_list-page.html', {'list_reports': list_reports})
 
 
 def UnderConsiderationReports(request):
     USER = UserProfile.objects.get(user=request.user)
     list_reports = Report.objects.filter(
         status='Рассматривается', organisation__name=USER.organisation)
-    return render(request, 'main_application/under_consideration_reports_list.html', {'list_reports': list_reports})
+    return render(request, 'main_application/ROLE_subject/under_consideration_reports_list.html', {'list_reports': list_reports})
 
 
 def NeedChangeReports(request):
     USER = UserProfile.objects.get(user=request.user)
     list_reports = Report.objects.filter(
         status='Доработать', organisation__name=USER.organisation)
-    return render(request, 'main_application/need_change_reports_list.html', {'list_reports': list_reports})
+    return render(request, 'main_application/ROLE_subject/need_change_reports_list.html', {'list_reports': list_reports})
 
 
 
 
 def AddInfoIntoReport(request, id):
     report = Report.objects.get(id=id)
-    names_for_input = [] 
-    FIELSD = report.additional_field
-    if FIELSD == 0:
-        FIELSD = 1
-    columns = FIELSD * report.columns
-
+    names_for_input = []
+    FIELDS = report.additional_field
+    if FIELDS == 0:
+        FIELDS = 1
+    columns = FIELDS * report.columns
     for i in range(0, columns):
         name_input = 'input' + str(i)
         names_for_input.append(name_input)
     context = {
         "report": report,
-        'context': report.top_names,
-        'top': report.top_names,
         'inputs': names_for_input,
-        'message': report.message
     }
     if request.method == "POST":
         if 'fields' in request.POST:
             report.additional_field = int(request.POST['fields']) + int(1)
             report.save()
-
             return redirect('edit-page', id=id)
         else:
             DATAlist = []
@@ -158,9 +153,9 @@ def AddInfoIntoReport(request, id):
             report.status = "Рассматривается"
             message = "Отчёт заполнен, ожидайте проверки"
             report.save()
-            return render(request, 'main_application/READY.html', {"message": message})         
+            return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
     else:
-        return render(request, 'main_application/edit_report-page.html', context)
+        return render(request, 'main_application/ROLE_subject/edit_report-page.html', context)
 
 
 def ChangeReports(request, id):
@@ -187,21 +182,21 @@ def ChangeReports(request, id):
         report.status = "Рассматривается"
         report.save()
         message = 'Ваши изменения отчёта применены'
-        return render(request, 'main_application/READY.html', {"message": message})
-    return render(request, 'main_application/change_report-page.html', context)
+        return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
+    return render(request, 'main_application/ROLE_subject/change_report-page.html', context)
 
 
 # Раздел поручителя
 class ArchiveReports(LoginRequiredMixin, ListView):
-    paginate_by = 5
+    paginate_by = 15
     model = Report
-    template_name = 'main_application/ArchiveReports/archive-reports-page.html'
+    template_name = 'main_application/ROLE_report_collector/ArchiveReports/archive-reports-page.html'
     raise_exception = True
 
 
 def GpoupsPage(request):
     groups = GroupOfReports.objects.all
-    return render(request, 'main_application/groups-page.html', {'groups': groups})
+    return render(request, 'main_application/ROLE_report_collector/groups-page.html', {'groups': groups})
 
 
 def TableForExcel(request, id):
@@ -216,21 +211,19 @@ def TableForExcel(request, id):
     SUBJECTS = group.ListGroups
     REPORTS = reports
     lenth = len(TOP)
-    
-    
-    return render(request, 'main_application/excel-page.html', {"TOP": TOP, 'group':group,
-     'subjects':SUBJECTS, 'reports':REPORTS, "len": lenth})
+
+    return render(request, 'main_application/ROLE_report_collector/excel-page.html', {"TOP": TOP, 'group':group,
+     'subjects':SUBJECTS, 'reports':REPORTS, "BOT": report.top_names})
 
 
 def ReportsOfGroup(request, id):
     reports = Report.objects.filter(group__id=id)
     group = GroupOfReports.objects.get(id=id)
-    return render(request, 'main_application/reports-of-group.html', {'reports': reports, 'group': group})
+    return render(request, 'main_application/ROLE_report_collector/reports-of-group.html', {'reports': reports, 'group': group})
 
 
 class ChoiceGroupOrIndividual(TemplateView):
-    template_name = 'main_application/ArchiveReports/ChoiceGroupOrIndividual-page.html'
-
+    template_name = 'main_application/ROLE_report_collector/ChoiceGroupOrIndividual-page.html'
 
 
 def CreateGroup(request):
@@ -243,17 +236,14 @@ def CreateGroup(request):
         group.save()
         return redirect('add_report', id=group.id)  # с переменными
     else:
-        ListSubjects = Organisation.objects.all
         values = []
-        count = Organisation.objects.count()
-        for i in range(0, count):
-            name = 'org' + str(i)
-            values.append(name)
-        context = dict()
-        for i in range(0, count):
-            key = values[i]
-            context[key] = Organisation.objects.get(id=i+1)
-        return render(request, 'main_application/CreateFormReport/CreateGroup-page.html', {'context': context})
+        for i in Organisation.objects.all():
+            values.append(str(i.name))
+        if 'Администратор' in values:
+            values.remove('Администратор')
+        if 'ГОСКОМЦИФРОВИЗАЦИИ' in values:
+            values.remove('ГОСКОМЦИФРОВИЗАЦИИ')
+        return render(request, 'main_application/ROLE_report_collector/CreateFormReport/CreateGroup-page.html', {'context': values})
 
 
 def CreateFormReport(request, id):
@@ -278,7 +268,7 @@ def CreateFormReport(request, id):
                 report.organisation = organisation
                 report.save()
         return redirect('add_names', id=group.id)
-    return render(request, 'main_application/CreateFormReport/add_template_report-page.html',
+    return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_template_report-page.html',
      {'form': form, 'group': group})
 
 
@@ -302,7 +292,7 @@ def AddTopNameSToReport(request, id):
             report.save()
         return redirect('check', id=id)
     else:
-        return render(request, 'main_application/CreateFormReport/add_top_names-page.html',
+        return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_top_names-page.html',
                       {'inputs': inputs, 'report': report})
 
 
@@ -310,7 +300,7 @@ def CheckingInfoReport(request, id):
     group = GroupOfReports.objects.get(id=id)
     reports = Report.objects.filter(group__id=id).values_list('id', flat=True)
     report = Report.objects.get(id=reports[0])
-    return render(request, 'main_application/CreateFormReport/check-info-report-page.html',
+    return render(request, 'main_application/ROLE_report_collector/CreateFormReport/check-info-report-page.html',
                   {'report': report, 'contextTABLE': report.top_names, "group": group})
 
 
@@ -318,7 +308,7 @@ def DeleteGroup(request, id):
     group = GroupOfReports.objects.get(id=id)
     message = 'Группа ' + str(group.name) + ' удалён'
     group.delete()
-    return render(request, 'main_application/READY.html', {"message": message})
+    return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
 
 
 def DeleteReport(request, id):
@@ -331,12 +321,12 @@ def DeleteReport(request, id):
         ' удалён, он был в группе ' + str(group.name)
     group.save()
     report.delete()
-    return render(request, 'main_application/READY.html', {"message": message})
+    return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
 
 
 def CheckReportsList(request):
     list_reports = Report.objects.filter(status="Рассматривается")
-    return render(request, 'main_application/check-reports-page.html', {'list_reports': list_reports})
+    return render(request, 'main_application/ROLE_report_collector/check-reports-page.html', {'list_reports': list_reports})
 
 
 def CheckReport(request, id):
@@ -344,7 +334,6 @@ def CheckReport(request, id):
     report = Report.objects.get(id=id)
     context = {'report': report,
                'form': form,
-               'namesTABLE': report.top_names,
                'contextTABLE': report.context}
     if request.method == 'POST':
         if form.is_valid():
@@ -360,18 +349,18 @@ def CheckReport(request, id):
                 message = 'Статус "' + \
                     str(added_status) + \
                     '" присвоен для отчёта: ' + str(report.name)
-            return render(request, 'main_application/READY.html', {"message": message})
-    return render(request, 'main_application/check_report-page.html', context)
+            return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
+    return render(request, 'main_application/ROLE_report_collector/check_report-page.html', context)
 
 
 def SendedReports(request):
     list_reports = Report.objects.filter(status="Новый")
-    return render(request, 'main_application/sended-reports-page.html', {'list_reports': list_reports})
+    return render(request, 'main_application/ROLE_report_collector/sended-reports-page.html', {'list_reports': list_reports})
 
 
 # Настройка своего аккаунта
 def SettingsAccount(request):
-    return render(request, 'main_application/SettingsUser/settings_account-page.html', {'user': UserProfile.objects.get(user=request.user)})
+    return render(request, 'main_application/GENEREL_PURPOSE/SettingsUser/settings_account-page.html', {'user': UserProfile.objects.get(user=request.user)})
 
 
 def ChangeName(request, id):
@@ -386,7 +375,7 @@ def ChangeName(request, id):
                 userID.username = new_name
                 userID.save()
                 return redirect("settings_account")
-            return render(request, 'main_application/SettingsUser/change_NAME-page.html', {})
+            return render(request, 'main_application/GENEREL_PURPOSE/SettingsUser/change_NAME-page.html', {})
         else:
             raise Http404('Нет доступа')
 
@@ -404,7 +393,7 @@ def ChangeEmail(request, id):
                     user_info.email = form.cleaned_data['email']
                     user_info.save()
                     return redirect("settings_account")
-            return render(request, 'main_application/SettingsUser/change_EMAIL-page.html',
+            return render(request, 'main_application/GENEREL_PURPOSE/SettingsUser/change_EMAIL-page.html',
                           {'user': user_info, 'form': form})
         else:
             raise Http404('Нет доступа')
@@ -421,7 +410,7 @@ def ChangePhone(request, id):
                 user_info.phone_number = request.POST.get('phone')
                 user_info.save()
                 return redirect("settings_account")
-            return render(request, 'main_application/SettingsUser/change_PHONE-page.html',
+            return render(request, 'main_application/GENEREL_PURPOSE/SettingsUser/change_PHONE-page.html',
                           {'user': user_info})
         else:
             raise Http404('Нет доступа')
@@ -435,7 +424,7 @@ def AdminOrganisations(request):
         if form.is_valid():
             form.save()
         return redirect('admin_organisations')
-    return render(request, 'main_application/AdminPanel/admin_organisations.html',
+    return render(request, 'main_application/ROLE_administrator/admin_organisations.html',
                   {"organisations": all_organisations,
                    'form': form})
 
@@ -447,7 +436,7 @@ def RenameOrganisation(request, id):
         organisation.name = NewName
         organisation.save()
         return redirect('admin_organisations')
-    return render(request, 'main_application/AdminPanel/rename_organisation-page.html',
+    return render(request, 'main_application/ROLE_administrator/rename_organisation-page.html',
                   {"organisation": organisation})
 
 
@@ -458,7 +447,7 @@ def DeleteOrganisation(request, id):
         return redirect("admin_organisations")
     except IntegrityError:
         error = 'Сначала удалите аккаунты этой организации'
-        return render(request, 'main_application/ERRORS.html', {"errors": error})
+        return render(request, 'main_application/GENEREL_PURPOSE/ERRORS.html', {"errors": error})
 
 
 def UsersList(request):
@@ -472,8 +461,8 @@ def UsersList(request):
         USER.save()
         message = 'Пользователю ' + \
             str(USER.user.username) + " присвоена роль " + str(ROLE)
-        return render(request, 'main_application/READY.html', {"message": message})
-    return render(request, 'main_application/AdminPanel/adm_users.html',
+        return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
+    return render(request, 'main_application/ROLE_administrator/adm_users.html',
                   {"users": users, "roles": roles})
 
 
@@ -487,7 +476,7 @@ def CreateUser(request):
             acc = UserProfile.objects.create(user=added_user)
             acc.save()
             return redirect('users')
-    return render(request, 'main_application/AdminPanel/create_user.html', {'form': form})
+    return render(request, 'main_application/ROLE_administrator/create_user.html', {'form': form})
 
 
 def AddOrganisationToUser(request, id):
@@ -501,8 +490,8 @@ def AddOrganisationToUser(request, id):
         account.save()
         message = 'Пользователю ' + \
             str(user) + ' присвоена организация ' + str(organisation)
-        return render(request, 'main_application/READY.html', {"message": message})
-    return render(request, 'main_application/AdminPanel/AddOrgToUser-page.html',
+        return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
+    return render(request, 'main_application/ROLE_administrator/AddOrgToUser-page.html',
                   {"organisations": organisations, "user": user})
 
 
@@ -510,4 +499,4 @@ def DeleteUser(request, id):
     user = User.objects.filter(id=id)
     user.delete()
     message = 'Пользователь удалён из системы'
-    return render(request, 'main_application/READY.html', {"message": message})
+    return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})

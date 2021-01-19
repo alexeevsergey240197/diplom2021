@@ -18,12 +18,15 @@
             <input type="text" class="form-control" name="name" placeholder="Наименование" required>
         </div>
         <div class="form-check">
-            <div class="form-row">
-                {% for key, value  in context.items %}
-                <div class="form-group col-md-4">
+            <div class="form">
+                {% for value in context %}
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
                     <input class="form-check-input" type="checkbox" value="{{value}}" id="{{value}}" name="subjects">
                     <label class="form-check-label" for="{{value}}">{{value}}</label>
-                </div>
+                    </li>
+                </ul>
+          
                 {% endfor %}
             </div>
         </div>

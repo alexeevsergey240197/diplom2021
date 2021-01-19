@@ -10,19 +10,19 @@
     <p class="lead"> Отчет: "<b>{{report.name}}</b>"    ID: "<b>{{report.id}}</b>"  </p>
     <table class="table table-bordered mt-4">
         <tr>
-            {%for name in namesTABLE%}
-            <th scope="col">{{name}}</th>
+            {% for name in report.top_names %}
+            <th scope="col">{{ name }}</th>
             {% endfor %}
         </tr>
-     
-            {%for context in contextTABLE%}
-            {% if not forloop.counter|divisibleby:report.columns %}<tr>{% endif %}
+<tr>
+            {% for context in report.context %}
+
             <td> {{context}}</td>
-            {% if  forloop.counter|divisibleby:report.columns %}</tr>{% endif %}
+            {% if  forloop.counter|divisibleby:report.columns %}</tr> <tr>{% endif %}
             {% endfor %}
-            
+
     </table>
-    <p class="h4"> Сообщение для для субъекта отчетности </p> <small class="text-muted"> Дата обновления отчета:
+    <p class="h4"> Сообщение для для субъекта отчетности - ({{ report.organisation }}) </p> <small class="text-muted"> Дата обновления отчета:
     {{report.update_time}}</small>
     <table class="table table-bordered mt-4">
     <th><p>{{ report.message }}</p></th>
