@@ -160,8 +160,8 @@ def AddInfoIntoReport(request, id):
 
 def ChangeReports(request, id):
     report = Report.objects.get(id=id)
-    contextTABLE = report.context.split('*#*')
-    namesTABLE = report.top_names.split('*#*')
+    contextTABLE = report.context
+    namesTABLE = report.top_names
     names_for_input = []
     columns = report.columns
     context = {'report': report,
