@@ -7,12 +7,24 @@
 {% block content %}
 <div class="container mt-4">
   <h1 class="display-4 text-center pb-md-4">Управление организациями</h1>
+
+{% if message %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>Уведомление</strong> {{ message }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+{% endif %}
   <form method='POST'>
     {% csrf_token %}
     <div class="row justify-content-md-center" id="mytable">
       <div class="col">
         {{ form.name }}
       </div>
+<div class="col">
+      {{ form.type }}
+    </div>
       <div class="col col-lg-2">
         <button type="submit" class="btn btn-success">Добавить</button>
       </div>
@@ -25,6 +37,7 @@
       <tr>
         <th>id</th>
         <th scope="col" class='text-center'>Наименование организации</th>
+        <th scope="col" class='text-center'>Тип</th>
         <th scope="col" class='text-center'>Действия</th>
       </tr>
     </thead>
@@ -33,12 +46,17 @@
       <tr>
         <td>{{organisation.id}}</td>
         <td class='text-center'>{{organisation.name}}</td>
+        <td class='text-center'>{{organisation.type}}</td>
+
+
         <td class='text-center'> <a href="/rename_organisation/{{organisation.id}}"> <button type="button"
               class="btn btn-outline-primary">Переименовать </button> </a>
-          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#{{organisation.name}}">Удалить
+
+          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#{{organisation.id}}"> Удалить
           </button>
+
       </tr>
-      <div class="modal fade" id="{{organisation.name}}">
+      <div class="modal fade" id="{{organisation.id}}">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">

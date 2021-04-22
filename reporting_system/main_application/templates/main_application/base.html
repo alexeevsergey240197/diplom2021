@@ -7,7 +7,7 @@
     <title>{% block title%} {% endblock %}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="shortcut icon" href="{% static 'images/logo-site.png' %}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
@@ -28,11 +28,11 @@
         .resize {
             resize: both;
         }
-       
+
         .workzone-zone {
-            width: 400px; /* Ширина слоя */
-            height: 820px; /* Высота слоя */
-            overflow: scroll;
+            width: 500px; /* Ширина слоя */
+
+
         }
 
         .myshadow {
@@ -51,7 +51,7 @@
                         <ul class="nav flex-column ">
                             <h6
                                 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                                <span>{{ user_organisation }}</span></h6>
+                                <span>Тут организация</span></h6>
                             <li class="nav-item">
                                 <a class="nav-link active" href="{% url 'main-page' %}">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -328,14 +328,8 @@
             </main>
         </div>
     </div>
-    <div class="fixed-bottom">
-        <footer class="py-4 bg-light text-black-50 myshadow">
-            <div class="container text-center">
-                <small>Государственный комитет цифрового развития и связи Республики Хакасия &copy; 2020 Телефон -
-                    237-994</small>
-            </div>
-        </footer>
-    </div>
+
+
 </body>
 
 </html>

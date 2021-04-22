@@ -13,23 +13,23 @@
     <div class="card-deck mb-3 text-center">
         <div class="card mb-4 shadow-sm">
             <div class="card-header">
-                <h4 class="my-0 font-weight-normal">Группа отчётов</h4>
+                <h4 class="my-0 font-weight-normal">Одинарное значение</h4>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled mt-3 mb-4">
-                    <li>Создать группу получателей отчётности</li>
-                    <li>с общими именами полей</li>
+                    <li>Создание отчёта с одинарным значением</li>
+                    <li>с поддержкой комментария и выбора типа данных</li>
                 </ul>
-                <button type="button" onclick="location.href='{% url 'create_group' %}'" class="btn btn-lg btn-block btn-outline-primary">Перейти</button>
+                <button type="button" onclick="location.href='{% url 'add_report' %}'" class="btn btn-lg btn-block btn-outline-primary">Перейти</button>
             </div>
         </div>
         <div class="card mb-4 shadow-sm">
             <div class="card-header">
-                <h4 class="my-0 font-weight-normal">Индивидуальный отчёт</h4>
+                <h4 class="my-0 font-weight-normal">Множество значений</h4>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled mt-3 mb-4">
-                    <li>Создать отчёт для</li>
+                    <li>Создание отчёта с множеством значений</li>
                     <li>одного субъекта отчётности</li>
                 </ul>
                <button type="button" onclick="location.href='http://time100.ru/'" class="btn btn-lg btn-block btn-outline-primary">Перейти</button>
@@ -38,7 +38,7 @@
     </div>
     <div class="text-center">
         <div class="alert alert-success" role="alert">
-            <strong>Шаг 1 </strong>Выберите тип отправки формы
+            <strong>Шаг 1 </strong>Выберите тип формы
         </div>
     </div>
 </div>

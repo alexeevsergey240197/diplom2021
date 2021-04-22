@@ -8,6 +8,7 @@ from django.contrib import auth
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import *
 from .models import *
@@ -223,29 +224,62 @@ def ReportsOfGroup(request, id):
 
 
 class ChoiceGroupOrIndividual(TemplateView):
-    template_name = 'main_application/ROLE_report_collector/ChoiceGroupOrIndividual-page.html'
+    template_name = 'main_application/ROLE_report_collector/Choice_one_or_many-page.html'
 
 
-def CreateGroup(request):
+
+def CreateFormReport(request):
+
+
     if request.method == 'POST':
-        subjects = request.POST.getlist('subjects')
-        name = request.POST.get('name')
+        """ Создаётся группа """
         group = GroupOfReports()
-        group.name = name
-        group.ListGroups = subjects
-        group.save()
-        return redirect('add_report', id=group.id)  # с переменными
-    else:
-        values = []
-        for i in Organisation.objects.all():
-            values.append(str(i.name))
-        if 'Администратор' in values:
-            values.remove('Администратор')
-        if 'ГОСКОМЦИФРОВИЗАЦИИ' in values:
-            values.remove('ГОСКОМЦИФРОВИЗАЦИИ')
-        return render(request, 'main_application/ROLE_report_collector/CreateFormReport/CreateGroup-page.html', {'context': values})
+        group.name = request.POST.get('name_group')
+        group.organisations = request.POST.getlist('organisations')
 
 
+
+        """ Создание формы """
+        string_informations = ''
+        print(request.POST.get('count_colPOST'))
+        for i in range(1, int(request.POST.get('count_colPOST')) + 1):
+            string_informations = request.POST.get('input_name-' + str(i)) + '$##' + request.POST.get('input_comment-' + str(i)) + '$#*#' + request.POST.get('input_type-' + str(i)) + '$&&'
+            print(string_informations)
+            
+        """ Отсылается каждой организации форма """
+        #for i in range(len(group.organisations)):
+
+
+
+
+    if 'count_col' in request.GET:
+        count_colGET = int(request.GET.get('count_col'))
+        count_colLIST = []
+        for i in range(1, count_colGET + 1):
+            count_colLIST.append(i)
+        start = True
+        organisations = Organisation.objects.all
+        count_colInt = len(count_colLIST)
+
+        return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_template_report-page.html', {
+         'count_colLIST': count_colLIST,
+         'start_create': start,
+         'organisations': organisations,
+         'count_col':count_colInt})
+
+
+
+
+
+
+
+
+    return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_template_report-page.html', {})
+
+
+
+
+"""
 def CreateFormReport(request, id):
     group = GroupOfReports.objects.get(id=id)
     form = ReportForm(request.POST)
@@ -268,8 +302,7 @@ def CreateFormReport(request, id):
                 report.organisation = organisation
                 report.save()
         return redirect('add_names', id=group.id)
-    return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_template_report-page.html',
-     {'form': form, 'group': group})
+    return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_template_report-page.html', {})
 
 
 def AddTopNameSToReport(request, id):
@@ -294,7 +327,7 @@ def AddTopNameSToReport(request, id):
     else:
         return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_top_names-page.html',
                       {'inputs': inputs, 'report': report})
-
+"""
 
 def CheckingInfoReport(request, id):
     group = GroupOfReports.objects.get(id=id)
@@ -422,8 +455,17 @@ def AdminOrganisations(request):
     form = OrganisationForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
-        return redirect('admin_organisations')
+            nameORG= form.cleaned_data['name']
+            try:
+                ORG = Organisation.objects.get(name=nameORG)
+                message = 'Организация "' + nameORG + '" уже имеется в системе'
+            except ObjectDoesNotExist:
+                    form.save()
+                    message = 'Организация "' + nameORG + '" создана'
+        return render(request, 'main_application/ROLE_administrator/admin_organisations.html',
+                      {"organisations": all_organisations,
+                       'form': form,
+                       'message': message})
     return render(request, 'main_application/ROLE_administrator/admin_organisations.html',
                   {"organisations": all_organisations,
                    'form': form})
@@ -446,7 +488,7 @@ def DeleteOrganisation(request, id):
         organisation.delete()
         return redirect("admin_organisations")
     except IntegrityError:
-        error = 'Сначала удалите аккаунты этой организации'
+        error = 'Сначала удалите аккаунты этой организации '
         return render(request, 'main_application/GENEREL_PURPOSE/ERRORS.html', {"errors": error})
 
 
@@ -497,6 +539,6 @@ def AddOrganisationToUser(request, id):
 
 def DeleteUser(request, id):
     user = User.objects.filter(id=id)
+    message = 'Пользователь' + user.name + ' удалён из системы'
     user.delete()
-    message = 'Пользователь удалён из системы'
     return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})

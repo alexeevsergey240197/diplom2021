@@ -1,40 +1,109 @@
 {% extends 'main_application/base.html' %}
 
 {% block title %}
-Создание формы отчета
+  Создание формы отчета
 {% endblock %}
 
 {% block content %}
-<div class="text-center">
+  <div class="text-center">
     <h1 class="display-4">Создание формы отчета</h1>
-    <h5> Для группы "{{ group.name }}"</h5>
-</div>
-<div class="container mt-4">
-    <form method="POST">
-        <div class="form-row">
-            {% csrf_token %}
-            <div class="form-group col-md-6">
-                <label>Наименование</label>
-                {{ form.name }}
-            </div>
-            <div class="form-group col-md-2">
-                <label>Столбцы</label>
-                {{ form.columns }}
-            </div>
-            <div class="form-group">
-                <label>Дополнительное сообщение</label>
-                {{ form.message }}
-            </div>
+    <h5 style="margin-bottom: 30px">Создание формы для заполнения</h5>
+  </div>
+
+  {% if start_create %}
+
+  {% else %}
+
+    <form method="GET" style="margin-bottom: 30px">
+      <div class="row justify-content-center">
+        <div class="col-auto">
+          <button type="submit" class="btn btn-outline-success">Создать</button>
         </div>
-        <div class="text-center">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Отправить</button>
+        <div class="col-auto">
+          <input type="number" name="count_col" class="form-control" placeholder="кол-во" min="1" max="50" required="required">
         </div>
+      </div>
     </form>
-<p> </p>
-    <div class="text-center">
-        <div class="alert alert-success" role="alert">
-            <strong>Шаг 3. </strong>Введите основную информацю о отчете
-        </div>
+  {% endif %}
+  {% if count_colLIST %}
+    <div class="alert alert-success text-center" role="alert">
+      <strong>Шаг 1.
+      </strong>Заполните поля
     </div>
-</div>
+
+    <form method="POST">
+        <input hidden type="number" name="count_colPOST" value="{{ count_col }}">
+      {% csrf_token %}
+      <table class="table table-bordered table-hover text-center" style="margin-bottom: 50px">
+        <thead>
+          <tr>
+            <th >Номер</th>
+            <th >Наименование показателя/компонента</th>
+            <th >Комментарий</th>
+            <th >Требуемый тип данных</th>
+            <th >Значение</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for count in count_colLIST %}
+            <tr>
+              <td>
+                {{ count }}
+              </td>
+              <td >
+                <textarea class="form-control" name='input_name-{{ count }}' rows="3" placeholder="Введите наименование значения" required="required"></textarea>
+              </td>
+              <td >
+                <textarea class="form-control" name='input_comment-{{ count }}' rows="3" placeholder="Введите комментарий" required="required"></textarea>
+              </td>
+              <td >
+                <select class="form-control" name='input_type-{{ count }}'>
+                  <option>Текст</option>
+                  <option>Число</option>
+                </select>
+              </td>
+              <td >-</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="alert alert-success text-center" role="alert">
+        <strong>Шаг 2.
+        </strong>Добавьте сообщение
+      </div>
+      <label for="message">Введите введите сообщение для субъекта</label>
+      <textarea style="margin-bottom: 30px" class="form-control" id='message' rows="2" name='message' placeholder="Сообщение" maxlength="3000" required="required"></textarea>
+      <div class="alert alert-success text-center" role="alert">
+        <strong>Шаг 3.
+        </strong>Дайте наименование
+      </div>
+      <label for="name_report">Введите наименование отчётности</label>
+      <textarea style="margin-bottom: 30px" class="form-control" id='name_report' rows="2" name='name_report' placeholder="Наименование отчётности" maxlength="300" required="required"></textarea>
+      <div class="alert alert-success text-center" role="alert">
+        <strong>Шаг 4.
+        </strong>Дайте наименование групппе получателей, и выберите получателей
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" name="name_group" placeholder="Наименование группы" required="required">
+      </div>
+      <div class="form-check">
+        <div class="form">
+          <ul class="list-group
+    list-group-flush">
+            {% for organisation in organisations %}
+              <li class="list-group-item">
+                <input class="form-check-input" type="checkbox" value="{{organisation.id}}" id="{{organisation.name}}" name="organisation.names">
+                <label class="form-check-label" for="{{organisation.name}}">{{organisation.name}}
+                  -
+                  {{organisation.type}}</label>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="text-center" style="margin-bottom: 150px">
+        <button type='submit' class="btn btn-primary btn-lg">Создать форму и отправить</button>
+      </div>
+    </form>
+  {% endif %}
 {% endblock %}

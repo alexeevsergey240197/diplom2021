@@ -36,7 +36,25 @@
                   {% if user.organisation %}
                   {{user.organisation}}
                   {% else%}
-                  <a href="/add_organisation_to_user/{{user.user.id}}"><button type="button" class="btn btn-info">Добавить организацию</button></a>
+
+                    {% if user.role != 'Администратор' %}
+                    {% if user.role %}
+                    {% if user.role != 'Поручитель отчётности' %}
+                  <a href="/add_organisation_to_user/{{user.user.id}}"><button type="button" class="btn btn-info">Назначить организацию</button></a>
+                    {% else %}
+                        Изменения запрещены
+                    {% endif %}
+                    {% else %}
+                    Укажите сначала роль
+                    {% endif  %}
+
+                    {% else %}
+                    Изменения запрещены
+                      {% endif %}
+
+
+
+
                   {% endif %}
                 </td>
                 <td class='text-center'>{{user.user.username}}</td>
@@ -63,7 +81,14 @@
                   Пользователь не указал номер телефона
                   {% endif %}
                   </td>
+                    {% if user.role != 'Администратор' and user.role != 'Поручитель отчётности' %}
+
                 <td><button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete{{user.user.id}}">Удалить</button></td>
+
+                {% else %}
+    <td>Изменения запрещены</td>
+                {% endif %}
+
             </tr>
 
             <div class="modal fade" id="givearole{{user.user.id}}">

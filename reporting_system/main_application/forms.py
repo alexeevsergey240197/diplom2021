@@ -15,7 +15,7 @@ class AuthUserForm(AuthenticationForm, forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control btn'
 
-
+"""
 class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
@@ -52,7 +52,7 @@ class CheckReportForm(forms.ModelForm):
                                                              'cols': 145,
                                                              'placeholder': 'Поле ввода',
                                                              'class': 'form-control'})
-
+"""
 
 class SettingsUser(forms.ModelForm):
     class Meta:
@@ -70,7 +70,7 @@ class SettingsUser(forms.ModelForm):
 class OrganisationForm(forms.ModelForm):
     class Meta:
         model = Organisation
-        fields = ('name',)
+        fields = ('name', 'type')
 
 
     def __init__(self, *args, **kwargs):

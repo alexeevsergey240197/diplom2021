@@ -16,11 +16,11 @@ urlpatterns = [
     path('edit/<int:id>', views.AddInfoIntoReport, name='edit-page'),
     path('groups/', views.GpoupsPage, name='groups-page'),
     path('table_excel_download/<int:id>', views.TableForExcel, name='table_excel'),
-    path('choice_group_of_individual', views.ChoiceGroupOrIndividual.as_view(), name='choice_GorI'),
-    path('create_group', views.CreateGroup, name='create_group'),
+    path('сhoice_one_or_many', views.ChoiceGroupOrIndividual.as_view(), name='choice_GorI'),
+    
     path('reports_of_group/<int:id>', views.ReportsOfGroup, name='reports_of_group'),
-    path('add_report/<int:id>', views.CreateFormReport, name='add_report'),
-    path('add_names/<int:id>', views.AddTopNameSToReport, name='add_names'),
+    path('add_report', views.CreateFormReport, name='add_report'),
+
     path('check/<int:id>', views.CheckingInfoReport, name='check'),
     path('delete_group/<int:id>', views.DeleteGroup, name='delete_group'),
     path('delete/<int:id>', views.DeleteReport),
