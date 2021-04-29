@@ -92,7 +92,7 @@
     list-group-flush">
             {% for organisation in organisations %}
               <li class="list-group-item">
-                <input class="form-check-input" type="checkbox" value="{{organisation.id}}" id="{{organisation.name}}" name="organisation.names">
+                <input class="form-check-input" type="checkbox" value="{{organisation.id}}" id="{{organisation.name}}" name="organisations">
                 <label class="form-check-label" for="{{organisation.name}}">{{organisation.name}}
                   -
                   {{organisation.type}}</label>

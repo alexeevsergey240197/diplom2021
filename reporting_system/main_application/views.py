@@ -243,11 +243,13 @@ def CreateFormReport(request):
         string_informations = ''
         print(request.POST.get('count_colPOST'))
         for i in range(1, int(request.POST.get('count_colPOST')) + 1):
-            string_informations = request.POST.get('input_name-' + str(i)) + '$##' + request.POST.get('input_comment-' + str(i)) + '$#*#' + request.POST.get('input_type-' + str(i)) + '$&&'
+            string_informations = request.POST.get('input_name-' + str(i)) + '#$#' + request.POST.get('input_comment-' + str(i)) + '#$#' + request.POST.get('input_type-' + str(i)) + '$#$'
             print(string_informations)
-            
+        print(request.POST.getlist('organisations'))
+
         """ Отсылается каждой организации форма """
-        #for i in range(len(group.organisations)):
+        for i in range(len(request.POST.getlist('organisations'))):
+            organisation = Organisation.objects.get(id=)
 
 
 
