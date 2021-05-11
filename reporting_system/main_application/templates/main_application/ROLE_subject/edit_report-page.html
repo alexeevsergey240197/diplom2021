@@ -6,63 +6,63 @@
 
 
 {% block content %}
-<div class="container mt-4 ">
-    <p class="lead"> Редактирование "<b>{{ report.name }}</b>" </p>
-    <form method="POST">
-        <table class="table table-bordered mt-4">
-            <tr>
-                {%for name in report.top_names%}
-                <th scope="col">{{ name }}</th>
-                {% endfor %}
-            </tr>
-            {% csrf_token %}
-              <tr>
-                {%for var in inputs%}
-                <td>
-                    <textarea class="form-control" name='{{var}}' placeholder="Поле ввода" rows="3"
-                        required></textarea>
-                </td>
-                {% if forloop.counter|divisibleby:report.columns %}</tr>    <tr>{% endif %}
-                {% endfor %}
-        </table>
-        <div class="text-center">
-            <button type="submit" class="btn btn-outline-success">Отправить</button>
-        </div>
-        <p>Изменить количество строк?
-            <svg height="40pt" viewBox="0 0 512 512" width="40pt" xmlns="http://www.w3.org/2000/svg" type="button"
-                data-toggle="modal" data-target="#add_fields">
-                <path
-                    d="m256 0c-141.164062 0-256 114.835938-256 256s114.835938 256 256 256 256-114.835938 256-256-114.835938-256-256-256zm0 0"
-                    fill="#2196f3" />
-                <path
-                    d="m368 277.332031h-90.667969v90.667969c0 11.777344-9.554687 21.332031-21.332031 21.332031s-21.332031-9.554687-21.332031-21.332031v-90.667969h-90.667969c-11.777344 0-21.332031-9.554687-21.332031-21.332031s9.554687-21.332031 21.332031-21.332031h90.667969v-90.667969c0-11.777344 9.554687-21.332031 21.332031-21.332031s21.332031 9.554687 21.332031 21.332031v90.667969h90.667969c11.777344 0 21.332031 9.554687 21.332031 21.332031s-9.554687 21.332031-21.332031 21.332031zm0 0"
-                    fill="#fafafa" /></svg></p>
-    </form>
-    <div class="modal fade" id="add_fields">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Добавление полей в отчёт "{{ report.name }}"</h4>
-                    <button type="button" class="close" data-dismiss="modal">×</button>
-                </div>
-                <div class="modal-body">
-                    Сколько дополнительных строк вы хотите сделать?
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="row justify-content-center">
-                            <input name="fields" type="number" class='form-group col-md-4 text-center mt-4' max='50' placeholder="Кол-во строк" required>
-                        </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class=" btn btn-primary">Добавить</button>
-                    </form>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <p>Количество строк - {{ report.additional_field }}. Столбцы - {{ report.columns }}</p>
-    <p class="h4"> Сообщение </p> <small class="text-muted">{{report.update_time}}</small>
-    <p> {{ report.message }} </p>
+<h5 class="text-center">
+{{ report.name }}
+</h5>
+<div class="table-responsive">
+<table class="table table-hover table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th>#</th>
+      <th>Наименование показателя/компонента</th>
+      <th>Комментарий</th>
+
+      <th>Поля ввода</th>
+    </tr>
+  </thead>
+  <tbody>
+<form method="POST">
+        {% csrf_token %}
+    {% for row in ListRows%}
+      <tr>
+        <td>  {{ forloop.counter }} </td>
+      {% for col in row%}
+
+                {% if col != 'Число' and col != 'Текст' %}
+              <td style="width: 30%;">  {{ col }} </td>
+              {% endif %}
+
+              {% if col == 'Число'%}
+
+              <td>  <input name='input-{{ forloop.parentloop.counter  }}' type="number" class="form-control"  placeholder="Поля ввода"> </td>
+
+              {% endif %}
+
+              {% if col == 'Текст' %}
+
+                <td> <textarea name='input-{{ forloop.parentloop.counter  }}'class="form-control"  rows="3"></textarea> </td>
+  {% endif %}
+
+      {% endfor %}
+                </tr>
+
+    {% endfor %}
+
+  </tbody>
+</table>
 </div>
+<div class="text-center" style="margin-bottom: 50px">
+<button type='submit' class="btn btn-primary btn-lg">Отправить данные</button>
+</div>
+</form>
+<h3 class="text-center"> Сообщение от отправителя:</h3>
+
+<h6 class="text-muted"> Дата создания формы: {{ report.start_date }} </h6>
+<h6 class="text-muted"> Обновлено: {{ report.update_time  }} </h6>
+
+<div class="alert alert-primary" role="alert" style="margin-bottom: 50px">
+{{ report.message }}
+</div>
+
+
 {% endblock %}

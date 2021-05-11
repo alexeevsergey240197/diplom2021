@@ -6,39 +6,71 @@
 
 
 {% block content %}
-<div class="container mt-4 ">
-    <p class="lead"> Отчет: "<b>{{report.name}}</b>" ID: "<b>{{report.id}}</b>" </p>
-    <table class="table table-bordered mt-4">
-        <tr>
-            {%for name in namesTABLE%}
-            <th scope="col">{{name}}</th>
-            {% endfor %}
-        </tr>
-        <tr>
-            {%for context in contextTABLE %}
-            <th>{{ context }}</th>
-            {% endfor %}
-        </tr>
-    </table>
-    Изменить поля на:
-     <p><small class="text-muted"> Не оставляйте поля пустыми</small></p>
-    <form method="POST">
+<h5 class="text-center">
+{{ report.name }}
+</h5>
+<div class="table-responsive">
+<table class="table table-hover table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th>#</th>
+      <th>Наименование показателя/компонента</th>
+      <th>Комментарий</th>
+
+      <th>Поля ввода</th>
+    </tr>
+  </thead>
+  <tbody>
+<form method="POST">
         {% csrf_token %}
-        <table class="table table-bordered mt-4">
-            <tr>
-                {%for name in names_for_input%}
-                <th><textarea class="form-control" name='{{ name }}' placeholder="Поле ввода" rows="3"></textarea></th>
-                {% endfor %}
-            </tr>
-        </table>
-        <div class="text-center">
-            <button type="submit" class="btn btn-outline-success">Внести изменения</button>
-        </div>
-    </form>
-    <p class="h4"> Сообщение от поручителя: </p>
-    <small class="text-muted"> Дата обновления отчета: {{report.update_time}}</small>
-    <table class="table table-bordered mt-4">
-        <th><p>{{ report.message_help }}</p></th>
-    </table>
+    {% for row in ListRows%}
+      <tr>
+        <td>  {{ forloop.counter }} </td>
+      {% for col in row%}
+
+                {% if col != 'Число' and col != 'Текст' %}
+              <td style="width: 30%;">  {{ col }} </td>
+              {% endif %}
+
+              {% if col == 'Число'%}
+
+              <td>  <input name='input-{{ forloop.parentloop.counter  }}' type="number" class="form-control"  placeholder="Поля ввода"> </td>
+
+              {% endif %}
+
+              {% if col == 'Текст' %}
+
+                <td> <textarea name='input-{{ forloop.parentloop.counter  }}'class="form-control"  rows="3"></textarea> </td>
+  {% endif %}
+
+      {% endfor %}
+                </tr>
+
+    {% endfor %}
+
+  </tbody>
+</table>
 </div>
+<div class="text-center" style="margin-bottom: 50px">
+<button type='submit' class="btn btn-primary btn-lg">Отправить данные</button>
+</div>
+</form>
+
+<h3 class="text-center"> Сообщение для помощи от отправителя:</h3>
+
+
+<div class="alert alert-warning" role="alert" style="margin-bottom: 50px">
+{{ report.message_help }} 12313
+</div>
+
+<h3 class="text-center"> Сообщение от отправителя:</h3>
+
+<h6 class="text-muted"> Дата создания формы: {{ report.start_date }} </h6>
+<h6 class="text-muted"> Обновлено: {{ report.update_time  }} </h6>
+
+<div class="alert alert-primary" role="alert" style="margin-bottom: 50px">
+{{ report.message }}
+</div>
+
+
 {% endblock %}

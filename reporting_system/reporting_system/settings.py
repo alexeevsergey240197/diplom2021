@@ -49,7 +49,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'main_application.notifications.ForMenu'
+                'main_application.notifications.ForMenu',
+                'main_application.notifications.ForMenuOrg'
             ],
         },
     },

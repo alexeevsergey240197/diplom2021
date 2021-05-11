@@ -36,3 +36,16 @@ def ForMenu(request):
                 }
         except ObjectDoesNotExist:
             return {}
+
+
+def ForMenuOrg(request):
+    if not request.user.is_authenticated:
+        return {}
+    else:
+        username = request.user
+        try:
+            USER = UserProfile.objects.get(user=username)
+            org = USER.organisation
+            return {'org':org}
+        except ObjectDoesNotExist:
+            return {}

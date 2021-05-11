@@ -127,67 +127,49 @@ def NeedChangeReports(request):
 
 
 def AddInfoIntoReport(request, id):
+
     report = Report.objects.get(id=id)
-    names_for_input = []
-    FIELDS = report.additional_field
-    if FIELDS == 0:
-        FIELDS = 1
-    columns = FIELDS * report.columns
-    for i in range(0, columns):
-        name_input = 'input' + str(i)
-        names_for_input.append(name_input)
-    context = {
-        "report": report,
-        'inputs': names_for_input,
-    }
+    rows = report.string_informations.split('$#$')
+    ListRows = []
+    for i in range(len(rows)):
+        ListRows.append(rows[i].split('#$#'))
+    del ListRows[-1]
+    context = {'ListRows': ListRows, 'report': report}
     if request.method == "POST":
-        if 'fields' in request.POST:
-            report.additional_field = int(request.POST['fields']) + int(1)
-            report.save()
-            return redirect('edit-page', id=id)
-        else:
-            DATAlist = []
-            for i in range(0, columns):
-                add = request.POST.get(names_for_input[i])
-                DATAlist.append(add)
-            report.context = DATAlist
-            report.status = "Рассматривается"
-            message = "Отчёт заполнен, ожидайте проверки"
-            report.save()
-            return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
-    else:
-        return render(request, 'main_application/ROLE_subject/edit_report-page.html', context)
+        contextReport = []
+        for i in range(1, len(ListRows) + 1):
+            info = request.POST.get('input-' + str(i))
+            contextReport.append(info)
+        report.context = contextReport
+        report.status = 'Рассматривается'
+        report.save()
+        message = 'Выш отчёт принят, ожидайте проверки'
+        return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
+    return render(request, 'main_application/ROLE_subject/edit_report-page.html', context)
 
 
 def ChangeReports(request, id):
     report = Report.objects.get(id=id)
-    contextTABLE = report.context
-    namesTABLE = report.top_names
-    names_for_input = []
-    columns = report.columns
-    context = {'report': report,
-               'contextTABLE': contextTABLE,
-               'namesTABLE': namesTABLE,
-               'names_for_input': names_for_input
-               }
-    for i in range(0, columns):
-        name_input = 'input' + str(i)
-        names_for_input.append(name_input)
-    if request.method == 'POST':
-        DATAlist = []
-        for i in range(0, columns):
-            add = request.POST.get(names_for_input[i])
-            DATAlist.append(add)
-        DATAstr = "*#*".join(DATAlist)
-        report.context = DATAstr
-        report.status = "Рассматривается"
+    rows = report.string_informations.split('$#$')
+    ListRows = []
+    for i in range(len(rows)):
+        ListRows.append(rows[i].split('#$#'))
+    del ListRows[-1]
+    context = {'ListRows': ListRows, 'report': report}
+    if request.method == "POST":
+        contextReport = []
+        for i in range(1, len(ListRows) + 1):
+            info = request.POST.get('input-' + str(i))
+            contextReport.append(info)
+        report.context = contextReport
+        report.status = 'Рассматривается'
         report.save()
-        message = 'Ваши изменения отчёта применены'
+        message = 'Выш отчёт принят, ожидайте проверки'
         return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
     return render(request, 'main_application/ROLE_subject/change_report-page.html', context)
 
 
-# Раздел поручителя
+# Раздел поручителя отчётности
 class ArchiveReports(LoginRequiredMixin, ListView):
     paginate_by = 15
     model = Report
@@ -229,31 +211,43 @@ class ChoiceGroupOrIndividual(TemplateView):
 
 
 def CreateFormReport(request):
-
-
     if request.method == 'POST':
         """ Создаётся группа """
         group = GroupOfReports()
         group.name = request.POST.get('name_group')
         group.organisations = request.POST.getlist('organisations')
-
+        group.save()
+        name = request.POST.get('name_report')
+        message = request.POST.get('message')
+        count_col = int(request.POST.get('count_col'))
+        name_group = request.POST.get('name_group')
 
 
         """ Создание формы """
         string_informations = ''
-        print(request.POST.get('count_colPOST'))
+
         for i in range(1, int(request.POST.get('count_colPOST')) + 1):
-            string_informations = request.POST.get('input_name-' + str(i)) + '#$#' + request.POST.get('input_comment-' + str(i)) + '#$#' + request.POST.get('input_type-' + str(i)) + '$#$'
+            string_informations = string_informations + request.POST.get('input_name-' + str(i)) + '#$#' + request.POST.get('input_comment-' + str(i)) + '#$#' + request.POST.get('input_type-' + str(i)) + '$#$'
             print(string_informations)
-        print(request.POST.getlist('organisations'))
-
-        """ Отсылается каждой организации форма """
-        for i in range(len(request.POST.getlist('organisations'))):
-            organisation = Organisation.objects.get(id=)
 
 
+        """ Отсылается каждой организации форма и присваивается групп"""
+        N = len(group.organisations)
+        for i in range(N):
+            organisation = Organisation.objects.get(id=group.organisations[i])
+            report = Report()
+            report.name = name
+            report.message = message
+            report.count_row = 4
+            report.count_col = count_col
+            report.organisation = organisation
+            report.group = group
+            report.string_informations = string_informations
 
+            report.status = 'Новый'
+            report.save()
 
+        return redirect('main-page')
     if 'count_col' in request.GET:
         count_colGET = int(request.GET.get('count_col'))
         count_colLIST = []
@@ -273,63 +267,9 @@ def CreateFormReport(request):
 
 
 
-
-
-
     return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_template_report-page.html', {})
 
 
-
-
-"""
-def CreateFormReport(request, id):
-    group = GroupOfReports.objects.get(id=id)
-    form = ReportForm(request.POST)
-    if request.method == 'POST':
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            columns = form.cleaned_data['columns']
-            message = form.cleaned_data['message']
-            listGROUPS = group.ListGroups
-            N = len(listGROUPS)
-            for i in range(0, N):
-                report = Report()
-                report.name = name
-                report.columns = columns
-                report.message = message
-                report.group = group
-                report.status = "Новый"
-                organisation = Organisation.objects.get(
-                    name=str(listGROUPS[i]))
-                report.organisation = organisation
-                report.save()
-        return redirect('add_names', id=group.id)
-    return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_template_report-page.html', {})
-
-
-def AddTopNameSToReport(request, id):
-    reports = Report.objects.filter(group__id=id).values_list('id', flat=True)
-    report = Report.objects.get(id=reports[0])
-    columns = report.columns
-    inputs = []
-    for i in range(0, columns):
-        name_input = 'input' + str(i)
-        inputs.append(name_input)
-    if request.method == 'POST':
-        DATAlist = []
-        for i in range(0, columns):
-            add = str(request.POST.get(inputs[i]))
-            DATAlist.append(add)
-        N = len(reports)
-        for i in range(0, N):
-            report = Report.objects.get(id=reports[i])
-            report.top_names = DATAlist
-            report.save()
-        return redirect('check', id=id)
-    else:
-        return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_top_names-page.html',
-                      {'inputs': inputs, 'report': report})
-"""
 
 def CheckingInfoReport(request, id):
     group = GroupOfReports.objects.get(id=id)
@@ -365,26 +305,34 @@ def CheckReportsList(request):
 
 
 def CheckReport(request, id):
-    form = CheckReportForm(request.POST)
     report = Report.objects.get(id=id)
-    context = {'report': report,
-               'form': form,
-               'contextTABLE': report.context}
+    account = UserProfile.objects.get(organisation=report.organisation)
+
+
+    string_informations = report.string_informations
+    rows = string_informations.split('$#$')
+    ListRows = []
+    del rows[-1]
+    print(report.context[0])
+    for i in range(len(rows)):
+        row = rows[i].split('#$#')
+        row.append(report.context[i])
+        ListRows.append(row)
+    context = {'report': report, 'ListRows':ListRows,'account':account}
+
     if request.method == 'POST':
-        if form.is_valid():
-            added_status = form.cleaned_data['status']
-            added_message = form.cleaned_data['message_help']
-            report.status = added_status
-            report.message_help = added_message
-            report.save()
-            if added_status == 'Сформирован':
-                message = "Отчёт " + str(report.name) + \
-                    " сформирован и помещен в архив"
-            else:
-                message = 'Статус "' + \
-                    str(added_status) + \
-                    '" присвоен для отчёта: ' + str(report.name)
-            return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
+        status = request.POST.get('status')
+        report.status = status
+        if status == 'Доработать':
+            report.message_help = request.POST.get('help_message')
+            message = "Отчёт от организации: " + str(report.organisation) + '- отправлен на доработку'
+        else:
+            message = "Отчёт от организации: " + str(report.organisation) + ' - принят'
+
+        report.save()
+
+
+        return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
     return render(request, 'main_application/ROLE_report_collector/check_report-page.html', context)
 
 

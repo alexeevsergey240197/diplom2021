@@ -6,33 +6,105 @@
 
 
 {% block content %}
-<div class="container mt-4 ">
-    <p class="lead"> Отчет: "<b>{{report.name}}</b>"    ID: "<b>{{report.id}}</b>"  </p>
-    <table class="table table-bordered mt-4">
-        <tr>
-            {% for name in report.top_names %}
-            <th scope="col">{{ name }}</th>
-            {% endfor %}
-        </tr>
-<tr>
-            {% for context in report.context %}
+<table class="table table-hover table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th>#</th>
+      <th>Наименование показателя/компонента</th>
+      <th>Комментарий</th>
+        <th>Тип данных</th>
+      <th>Полученное значение</th>
+    </tr>
+  </thead>
+  <tbody>
 
-            <td> {{context}}</td>
-            {% if  forloop.counter|divisibleby:report.columns %}</tr> <tr>{% endif %}
-            {% endfor %}
 
-    </table>
-    <p class="h4"> Сообщение для для субъекта отчетности - ({{ report.organisation }}) </p> <small class="text-muted"> Дата обновления отчета:
-    {{report.update_time}}</small>
-    <table class="table table-bordered mt-4">
-    <th><p>{{ report.message }}</p></th>
-    </table>
-    <form method="POST">
-        {% csrf_token %}
-        <p> {{ form }} </p>
-        <div class="text-center">
-            <button type="submit" class="btn btn-outline-success">Внести изменения</button>
-        </div>
-    </form>
+    {% for row in ListRows%}
+      <tr>
+        <td style="width: 1%;">  {{ forloop.counter }} </td>
+      {% for col in row%}
+
+      {% if col == 'Число' or col == 'Текст' %}
+
+              <td style="width: 5%;">  {{ col }} </td>
+      {% else%}
+      {% if forloop.last %}
+
+          <td style="width: 30%;">
+      <div class="alert alert-success" role="alert">
+  {{ col }}
+</div>
+      </td>
+      {% else %}
+        <td style="width: 30%;">  {{ col }} </td>
+        {% endif %}
+
+
+      {% endif %}
+
+
+
+
+      {% endfor %}
+                </tr>
+
+    {% endfor %}
+
+  </tbody>
+</table>
+
+<div class="text-center" style="margin-bottom: 50px">
+
+</div>
+</form>
+<h3 class="text-center"> Сообщение от отправителя:</h3>
+<h6 class="text-muted"> Дата создания формы: {{ report.start_date }} </h6>
+<h6 class="text-muted"> Обновлено: {{ report.update_time  }} </h6>
+<h6 class="text-muted"> Текущий статус: <b>{{ report.status }} </b> </h6>
+<div class="alert alert-primary" role="alert" style="margin-bottom: 50px">
+{{ report.message }}
+</div>
+<h3 class="text-center">Обработка отчёта</h3>
+<form method='POST'>
+    {% csrf_token %}
+<div class="form-group">
+   <label for="exampleFormControlSelect1">Выберите статус</label>
+   <select name='status' class="form-control">
+     <option value='Сформирован'>Отчёт принят</option>
+     <option value='Доработать'>Отправить повторно</option>
+   </select>
+ </div>
+
+<textarea name='help_message' class="form-control"  placeholder="Если отклоняете отчёт, напишите сообщение для помощи" rows="2" style="margin-bottom: 50px"></textarea>
+
+<div class="text-center" style="margin-bottom: 50px">
+<button type='submit' class="btn btn-primary btn-lg">Применить</button>
+</div>
+</form>
+
+<h3 class="text-center">Информация субъекта отчётности</h3>
+<h6> Организация: {{ report.organisation }} </h6>
+<h6> Аккаунт организации: {{ account }} </h6>
+<h6 class="text-center"> Контактные данные </h6>
+<div class='row'>
+<div class='col-4'>
+<h6> Телефонные номер:
+{% if account.phone_number %}
+
+  {{ account.phone_number }}
+{% else %}
+  Пользователь не указал телефон
+{% endif %}
+</h6>
+</div>
+<div class='col-4'>
+<h6> Электронная почта:
+  {% if account.email %}
+
+  {{ account.email }}
+{% else %}
+  Пользователь не указал почту
+{% endif %}</h6>
+</div>
 </div>
 {% endblock %}

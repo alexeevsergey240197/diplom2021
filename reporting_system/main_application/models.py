@@ -37,9 +37,9 @@ class Report(models.Model):
     top_names = SeparatedValuesField('Имена заголовков таблицы', max_length=1000, null=True, blank=True)
     message = models.TextField('Приложенное сообщение', max_length=3000, default='')
     message_help = models.TextField('Сообщение для помощи', max_length=1000, default='', blank=True)
-
     typeOne = models.BooleanField('Одинарное значение?', default= True)
     string_informations = models.TextField('Информация по строкам', max_length=5000, default='')
+    group = models.ForeignKey(GroupOfReports, default=None, on_delete=models.CASCADE)
 
 
     def __str__(self):
@@ -53,7 +53,7 @@ class UserProfile(models.Model):
     role_choice = (('Поручитель отчётности', 'Поручитель отчётности'), ('Субъект отчётности', 'Субъект отчётности'),
                    ('Администратор', 'Администратор'))
     user = models.OneToOneField(User, default="default user", on_delete=models.CASCADE)
-    organisation = models.OneToOneField(Organisation, default=None, null=True, blank=True, on_delete=models.DO_NOTHING,
+    organisation = models.OneToOneField(Organisation, default=None, null=True, blank=True, related_name='organisationR',on_delete=models.DO_NOTHING,
                                         verbose_name='Организация')
     email = models.EmailField('Электроная почта', blank=True)
     phone_number = models.TextField('Телефонный номер', blank=True, max_length=25)
