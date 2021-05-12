@@ -16,8 +16,8 @@
       <th>#</th>
       <th>Наименование показателя/компонента</th>
       <th>Комментарий</th>
-
       <th>Поля ввода</th>
+
     </tr>
   </thead>
   <tbody>
@@ -28,21 +28,38 @@
         <td>  {{ forloop.counter }} </td>
       {% for col in row%}
 
-                {% if col != 'Число' and col != 'Текст' %}
-              <td style="width: 30%;">  {{ col }} </td>
+        {% if col.items %}
+
+          {% for key, value in col.items %}
+
+
+
+
+            {% if key == 'Число'%}
+
+            <td>  <input name='input-{{ forloop.parentloop.parentloop.counter }}' type="number" class="form-control" value="{{ value }}"  placeholder="Поля ввода"></td>
+
+            {% endif %}
+
+            {% if key == 'Текст' %}
+
+              <td> <textarea name='input-{{ forloop.parentloop.parentloop.counter }}'class="form-control"  rows="3"> {{ value }}</textarea></td>
               {% endif %}
 
-              {% if col == 'Число'%}
+            {% endfor %}
 
-              <td>  <input name='input-{{ forloop.parentloop.counter  }}' type="number" class="form-control"  placeholder="Поля ввода"> </td>
+            {% else %}
 
-              {% endif %}
 
-              {% if col == 'Текст' %}
 
-                <td> <textarea name='input-{{ forloop.parentloop.counter  }}'class="form-control"  rows="3"></textarea> </td>
-  {% endif %}
 
+
+                <td style="width: 30%;">  {{ col }} </td>
+
+
+
+
+          {% endif %}
       {% endfor %}
                 </tr>
 

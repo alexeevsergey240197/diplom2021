@@ -152,14 +152,24 @@ def ChangeReports(request, id):
     report = Report.objects.get(id=id)
     rows = report.string_informations.split('$#$')
     ListRows = []
-    for i in range(len(rows)):
-        ListRows.append(rows[i].split('#$#'))
-    del ListRows[-1]
+    for i in range(len(rows)-1):
+
+        line = rows[i].split('#$#')
+        dictL = dict()
+        dictL[line[-1]] = report.context[i]
+
+        line[-1] = dictL
+
+        ListRows.append(line)
+
+
+
     context = {'ListRows': ListRows, 'report': report}
     if request.method == "POST":
         contextReport = []
         for i in range(1, len(ListRows) + 1):
             info = request.POST.get('input-' + str(i))
+            print(info)
             contextReport.append(info)
         report.context = contextReport
         report.status = 'Рассматривается'
@@ -178,25 +188,47 @@ class ArchiveReports(LoginRequiredMixin, ListView):
 
 
 def GpoupsPage(request):
-    groups = GroupOfReports.objects.all
-    return render(request, 'main_application/ROLE_report_collector/groups-page.html', {'groups': groups})
+    groups = GroupOfReports.objects.filter()
+    DictGroups = dict()
+
+    for i in range(len(groups)):
+        GR = groups[i]
+        DictGroups[GR] = 0
+        ready_reports = Report.objects.filter(group__id = GR.id, status = 'Сформирован').count()
+        all_reports = Report.objects.filter(group__id = GR.id).count()
+        no_ready_reports = all_reports - ready_reports
+        DictGroups[GR] = 'Сделано ' + str(ready_reports) + ' из ' + str(all_reports)
+        READY = False
+        if ready_reports == all_reports:
+            READY = True
+
+    return render(request, 'main_application/ROLE_report_collector/groups-page.html', {'groups': DictGroups, 'ready': READY})
 
 
 def TableForExcel(request, id):
     group = GroupOfReports.objects.get(id=id)
-    reports = Report.objects.filter(group__name=group.name)
-    report = reports[0]
+    reports = Report.objects.filter(group__id=group.id)
+    RepOne = reports[0]
+    organisations = []
+    for i in range(len(reports)):
+        organisations.append(str(reports[i].organisation))
+    rows = []
+    for i in range(len(reports)):
+        b = 0
 
-    top_names = []
-    top_names.append(str(report.name))
-    TOP = top_names + list(report.top_names)
+        string_informations = RepOne.string_informations.split('$#$')
+        string_informations = string_informations[i].split('#$#')
+        print(string_informations)
+        name, comment = string_informations[b], string_informations[b+1]
+        b += 3
+        row = []
+        row.append(name)
+        row.append(comment)
+        for k in range(len(reports)):
+            row.append(reports[k].context[i])
+        rows.append(row)
 
-    SUBJECTS = group.ListGroups
-    REPORTS = reports
-    lenth = len(TOP)
-
-    return render(request, 'main_application/ROLE_report_collector/excel-page.html', {"TOP": TOP, 'group':group,
-     'subjects':SUBJECTS, 'reports':REPORTS, "BOT": report.top_names})
+    return render(request, 'main_application/ROLE_report_collector/excel-page.html', {'group':group, 'organisations': organisations, 'rows':rows})
 
 
 def ReportsOfGroup(request, id):

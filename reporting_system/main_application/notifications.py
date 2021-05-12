@@ -16,6 +16,7 @@ def ForMenu(request):
             if role_check == 'Поручитель отчётности':
                 ALL_with_status_new = Report.objects.filter(status='Новый')
                 ALl_with_status_under_consideration = Report.objects.filter(status='Рассматривается')
+                ALl_with_status_dorabotaty = Report.objects.filter(status='Доработать').count()
                 return {
                     'user_organisation': USER.organisation,
                     'ALL_new_reports': ALL_with_status_new.count(),

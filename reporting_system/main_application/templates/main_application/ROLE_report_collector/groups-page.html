@@ -24,34 +24,39 @@
                 <th class="text-center">Действия</th>
 
             </tr>
-            {% for group in groups %}
+            {% for key, value in groups.items %}
             <tr>
-                <th class="text-center">{{group.id}}</th>
+                <th class="text-center">{{key.id}}</th>
 
-                <td class="text-center">{{group.name}}</td>
+                <td class="text-center">{{key.name}}</td>
 
-                <td class="text-center"><a href="{% url 'reports_of_group' group.id %}">Список отчётов...</a></td>
+                <td class="text-center"><a href="{% url 'reports_of_group' key.id %}"> <button type="button" class="btn btn-primary">Показать список отчётов</button></a></td>
 
-                <td class="text-center">Тут список сделать</td>
+                <td class="text-center">{{ value }} <p> <b> {% if ready == True %} Группа сформирована {% else %}  Группа ещё формируется  {% endif %} </b></p> </td>
 
                 <td class='text-center'>
-                    <a href="/table_excel_download/{{group.id}}"><button type="button"
+                  {% if ready == True %}
+                    <a href="/table_excel_download/{{key.id}}"><button type="button"
                             class="btn btn-outline-primary">Сформировать полную таблицу</button></a>
+                        {% else %}
+                        <button type="button"
+                                class="btn btn-outline-danger">Таблица не полна</button>
+                                {% endif %}
                     <button type="button" class="btn btn-danger" data-toggle="modal"
-                        data-target="#{{group.id}}">Удалить</button>
+                        data-target="#{{key.id}}">Удалить группу и отчёты</button>
             </tr>
-            <div class="modal fade" id="{{group.id}}">
+            <div class="modal fade" id="{{key.id}}">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title">Удаление "{{group.name}}"</h4>
+                            <h4 class="modal-title">Удаление "{{key.name}}"</h4>
                             <button type="button" class="close" data-dismiss="modal">×</button>
                         </div>
                         <div class="modal-body">
                             Вы действительного хотите удалить эту группу? Все отчёты также будут удалены.
                         </div>
                         <div class="modal-footer">
-                            <a href="/delete_group/{{group.id}}"><button type="button"
+                            <a href="/delete_key/{{key.id}}"><button type="button"
                                     class="btn btn-primary">Да</button></a>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
                         </div>

@@ -26,6 +26,12 @@
         });
 
     </script>
+    <style>
+   .body {
+    overflow: scroll; /* Добавляем полосы прокрутки */
+
+   }
+  </style>
 </head>
 <body>
     <script type="text/javascript" src="{% static 'DataTables/site.js.Без названия' %}"></script>
@@ -37,41 +43,37 @@
     </div>
     <h5> <a href="{% url 'groups-page' %}">К списку групп ᐊᐊᐊ </a></h5>
     <div class="mt-4">
-        <table id="example" class="table table-bordered mt-4" style="width: 100%;">
+        <table id="example" class="table table-bordered mt-4" style="width: 100%; ">
             <thead>
                 <tr>
-                    {% for part in TOP %}
-                    <td>
-                        {{ part }}
+
+                    <td style="width: 300px;">
+                        	Наименование показателя/компонента
                     </td>
-                    {% endfor %}
+                  <td style="width: 300px;">
+                         	Комментарий
+                    </td>
+
+                  {% for organisation in organisations %}
+
+                    <td style="width: 200px;">
+                        {{ organisation }}
+                  </td>
+                {% endfor %}
                 </tr>
             </thead>
 
-            {% for report in reports %}
-            <tr>
-                <td>{{ report.organisation  }}</td>
+            {% for row in rows %}
+              <tr>
 
+                {% for info in row %}
+                <td>
+                      {{ info }}
+                </td>
 
-                {% for part in report.context %}
-
-                <td> {{ part }}</td>
-
-                {% if forloop.counter|divisibleby:report.columns %}  <tr> <td>   </td>{% endif %}
-                  {% if forloop.last %}
-                  {% for part in BOT %}
-                  <td>
-
-                  </td>
-                  {% endfor %}
-
-                  {% endif %}
-
-                  {% endfor %}
-
-                </tr>
+                {% endfor %}
+            </tr>
             {% endfor %}
-
         </table>
 
 
