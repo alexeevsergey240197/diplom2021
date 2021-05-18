@@ -34,6 +34,8 @@ def MainPage(request):
     if not request.user.is_authenticated:
         return redirect('login_page')
     else:
+
+
         return render(request, template_name, {})
 
 
@@ -141,8 +143,11 @@ def AddInfoIntoReport(request, id):
             info = request.POST.get('input-' + str(i))
             contextReport.append(info)
         report.context = contextReport
+
         report.status = 'Рассматривается'
+        print(report.context)
         report.save()
+
         message = 'Выш отчёт принят, ожидайте проверки'
         return render(request, 'main_application/GENEREL_PURPOSE/READY.html', {"message": message})
     return render(request, 'main_application/ROLE_subject/edit_report-page.html', context)
@@ -169,7 +174,7 @@ def ChangeReports(request, id):
         contextReport = []
         for i in range(1, len(ListRows) + 1):
             info = request.POST.get('input-' + str(i))
-            print(info)
+
             contextReport.append(info)
         report.context = contextReport
         report.status = 'Рассматривается'
@@ -190,7 +195,7 @@ class ArchiveReports(LoginRequiredMixin, ListView):
 def GpoupsPage(request):
     groups = GroupOfReports.objects.filter()
     DictGroups = dict()
-
+    READY = False
     for i in range(len(groups)):
         GR = groups[i]
         DictGroups[GR] = 0
@@ -198,7 +203,7 @@ def GpoupsPage(request):
         all_reports = Report.objects.filter(group__id = GR.id).count()
         no_ready_reports = all_reports - ready_reports
         DictGroups[GR] = 'Сделано ' + str(ready_reports) + ' из ' + str(all_reports)
-        READY = False
+
         if ready_reports == all_reports:
             READY = True
 
@@ -213,15 +218,17 @@ def TableForExcel(request, id):
     for i in range(len(reports)):
         organisations.append(str(reports[i].organisation))
     rows = []
-    for i in range(len(reports)):
-        b = 0
+    Len_row = RepOne.string_informations.split('$#$')
+    del Len_row[-1]
+    N = len(Len_row)
+    b = 0
+    string_informations = RepOne.string_informations.split('$#$')
 
-        string_informations = RepOne.string_informations.split('$#$')
-        string_informations = string_informations[i].split('#$#')
-        print(string_informations)
-        name, comment = string_informations[b], string_informations[b+1]
-        b += 3
+    for i in range(N):
         row = []
+        string_informationsI = string_informations[i].split('#$#')
+        print(i)
+        name, comment = string_informationsI[b], string_informationsI[b+1]
         row.append(name)
         row.append(comment)
         for k in range(len(reports)):
@@ -253,16 +260,10 @@ def CreateFormReport(request):
         message = request.POST.get('message')
         count_col = int(request.POST.get('count_col'))
         name_group = request.POST.get('name_group')
-
-
         """ Создание формы """
         string_informations = ''
-
         for i in range(1, int(request.POST.get('count_colPOST')) + 1):
             string_informations = string_informations + request.POST.get('input_name-' + str(i)) + '#$#' + request.POST.get('input_comment-' + str(i)) + '#$#' + request.POST.get('input_type-' + str(i)) + '$#$'
-            print(string_informations)
-
-
         """ Отсылается каждой организации форма и присваивается групп"""
         N = len(group.organisations)
         for i in range(N):
@@ -275,10 +276,8 @@ def CreateFormReport(request):
             report.organisation = organisation
             report.group = group
             report.string_informations = string_informations
-
             report.status = 'Новый'
             report.save()
-
         return redirect('main-page')
     if 'count_col' in request.GET:
         count_colGET = int(request.GET.get('count_col'))
@@ -288,17 +287,11 @@ def CreateFormReport(request):
         start = True
         organisations = Organisation.objects.all
         count_colInt = len(count_colLIST)
-
         return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_template_report-page.html', {
          'count_colLIST': count_colLIST,
          'start_create': start,
          'organisations': organisations,
          'count_col':count_colInt})
-
-
-
-
-
     return render(request, 'main_application/ROLE_report_collector/CreateFormReport/add_template_report-page.html', {})
 
 
@@ -339,17 +332,16 @@ def CheckReportsList(request):
 def CheckReport(request, id):
     report = Report.objects.get(id=id)
     account = UserProfile.objects.get(organisation=report.organisation)
-
-
     string_informations = report.string_informations
     rows = string_informations.split('$#$')
     ListRows = []
     del rows[-1]
-    print(report.context[0])
+    print(report.context)
     for i in range(len(rows)):
         row = rows[i].split('#$#')
         row.append(report.context[i])
         ListRows.append(row)
+
     context = {'report': report, 'ListRows':ListRows,'account':account}
 
     if request.method == 'POST':

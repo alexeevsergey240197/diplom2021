@@ -1,6 +1,5 @@
 from django.db import models
 from separatedvaluesfield.models import SeparatedValuesField
-
 from django.contrib.auth.models import User
 
 
@@ -12,6 +11,7 @@ class Organisation(models.Model):
     def __str__(self):
         return self.name
 
+### 123123123123123 ###
 
 class GroupOfReports(models.Model):
     name = models.CharField('Наименование группы', max_length=200)

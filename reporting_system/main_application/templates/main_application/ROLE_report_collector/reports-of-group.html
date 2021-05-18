@@ -43,12 +43,19 @@
                 <td class="text-center">{{report.organisation}}</td>
 
                 <td class="text-center">
+                  {% if report.status != 'Новый' %}
+
                     <a href="/change/{{ report.id }}">
                   <button type="button" class="btn btn-warning">Изменить данные</button>
   </a>
                   <a href="/check_report/{{ report.id }}">
                   <button type="button" class="btn btn-info">Изменить статус</button>
                   </a>
+                  {% else %}
+                  Пользователь ещё не открывал отчёт
+                  
+                {% endif %}
+
                 </td>
             </tr>
             {% endfor %}

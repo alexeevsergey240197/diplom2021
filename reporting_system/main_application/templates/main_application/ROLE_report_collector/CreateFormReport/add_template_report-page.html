@@ -7,7 +7,7 @@
 {% block content %}
   <div class="text-center">
     <h1 class="display-4">Создание формы отчета</h1>
-    <h5 style="margin-bottom: 30px">Создание формы для заполнения</h5>
+    <h5 style="margin-bottom: 30px">Редактирование формы</h5>
   </div>
 
   {% if start_create %}
@@ -17,7 +17,7 @@
     <form method="GET" style="margin-bottom: 30px">
       <div class="row justify-content-center">
         <div class="col-auto">
-          <button type="submit" class="btn btn-outline-success">Создать</button>
+          <button type="submit" class="btn btn-outline-success">Создать с кол-вом строк></button>
         </div>
         <div class="col-auto">
           <input type="number" name="count_col" class="form-control" placeholder="кол-во" min="1" max="50" required="required">
